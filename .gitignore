@@ -1,0 +1,12 @@
+# Dependențe și fișiere generate
+node_modules/
+vendor/
+__pycache__/
+
+# Date sensibile (parole, conexiuni la baza de date)
+.env
+
+# Fișiere de sistem / editor
+.vscode/
+Thumbs.db
+desktop.ini
