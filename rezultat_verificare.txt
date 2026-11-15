@@ -1,0 +1,193 @@
+SET
+=== 1. Numărul de rânduri din fiecare tabel ===
+      tabel      | randuri 
+-----------------+---------
+ roluri          |       3
+ utilizatori     |      10
+ categorii       |      29
+ marci           |      23
+ produse         |      37
+ cosuri          |       4
+ cos_produse     |       8
+ comenzi         |      10
+ detalii_comanda |      22
+ miscari_stoc    |      61
+ servicii        |       6
+ cereri_service  |       8
+ istoric_service |      20
+(13 rows)
+
+=== 2. Utilizatori și rolurile lor (relația 1:N roluri → utilizatori) ===
+ id_utilizator |   utilizator    |           email           |   nume_rol    | activ 
+---------------+-----------------+---------------------------+---------------+-------
+             1 | Gabriel Crăița  | admin@techguard.ro        | Administrator | t
+             2 | Andrei Popa     | andrei.popa@techguard.ro  | Angajat       | t
+             3 | Elena Stan      | elena.stan@techguard.ro   | Angajat       | t
+             4 | Mihai Ionescu   | mihai.ionescu@gmail.com   | Client        | t
+             5 | Ana Dumitrescu  | ana.dumitrescu@yahoo.com  | Client        | t
+             6 | Vlad Marin      | vlad.marin@gmail.com      | Client        | t
+             7 | Ioana Georgescu | ioana.georgescu@gmail.com | Client        | t
+             8 | Cristian Radu   | cristian.radu@outlook.com | Client        | t
+             9 | Bianca Neagu    | bianca.neagu@gmail.com    | Client        | t
+            10 | Alexandru Toma  | alex.toma@gmail.com       | Client        | f
+(10 rows)
+
+=== 3. Arborele de categorii (relația recursivă) ===
+         categorie         |      subcategorie       | nr_produse 
+---------------------------+-------------------------+------------
+ Componente PC             | Procesoare              |          3
+ Componente PC             | Plăci video             |          4
+ Componente PC             | Memorii RAM             |          2
+ Componente PC             | SSD-uri                 |          2
+ Componente PC             | HDD-uri                 |          1
+ Componente PC             | Plăci de bază           |          2
+ Componente PC             | Surse                   |          1
+ Calculatoare și laptopuri | Laptopuri gaming        |          2
+ Calculatoare și laptopuri | Laptopuri office        |          1
+ Calculatoare și laptopuri | Desktop gaming          |          1
+ Console                   | PlayStation             |          1
+ Console                   | Xbox                    |          1
+ Console                   | Nintendo                |          1
+ Periferice                | Tastaturi               |          2
+ Periferice                | Mouse-uri               |          2
+ Periferice                | Căști                   |          1
+ Periferice                | Monitoare               |          2
+ Periferice                | Controllere             |          2
+ Jocuri video              | Jocuri PC               |          1
+ Jocuri video              | Jocuri PlayStation      |          1
+ Jocuri video              | Jocuri Nintendo         |          1
+ Accesorii                 | Răcire și pastă termică |          2
+ Accesorii                 | Cabluri și adaptoare    |          1
+(23 rows)
+
+=== 4. Catalog: produse cu categorie și marcă ===
+  cod_produs  |                          nume                          |      subcategorie       |      marca      |  pret   | stoc 
+--------------+--------------------------------------------------------+-------------------------+-----------------+---------+------
+ TG-CPU-0001  | Procesor AMD Ryzen 7 7800X3D                           | Procesoare              | AMD             | 1899.99 |   12
+ TG-CPU-0003  | Procesor Intel Core i5-14600K                          | Procesoare              | Intel           | 1499.99 |    9
+ TG-CPU-0002  | Procesor AMD Ryzen 5 7600                              | Procesoare              | AMD             |  999.99 |   20
+ TG-GPU-0001  | Placă video ASUS Dual GeForce RTX 4070 SUPER 12GB      | Plăci video             | ASUS            | 3399.99 |    6
+ TG-GPU-0002  | Placă video MSI Radeon RX 7800 XT Gaming Trio 16GB     | Plăci video             | MSI             | 2899.99 |    7
+ TG-GPU-0003  | Placă video Gigabyte GeForce RTX 4060 Eagle OC 8GB     | Plăci video             | Gigabyte        | 1549.99 |   20
+ TG-RAM-0001  | Memorie Kingston FURY Beast 32GB (2x16GB) DDR5 6000MHz | Memorii RAM             | Kingston        |  549.99 |   30
+ TG-RAM-0002  | Memorie Corsair Vengeance 16GB (2x8GB) DDR4 3200MHz    | Memorii RAM             | Corsair         |  229.99 |   25
+ TG-SSD-0002  | SSD WD Blue SN580 2TB NVMe M.2                         | SSD-uri                 | Western Digital |  699.99 |   14
+ TG-SSD-0001  | SSD Samsung 990 PRO 1TB NVMe M.2                       | SSD-uri                 | Samsung         |  649.99 |   18
+ TG-HDD-0001  | HDD Seagate BarraCuda 2TB 7200rpm                      | HDD-uri                 | Seagate         |  299.99 |   10
+ TG-MB-0002   | Placă de bază MSI PRO Z790-P WIFI                      | Plăci de bază           | MSI             | 1199.99 |    5
+ TG-MB-0001   | Placă de bază ASUS TUF GAMING B650-PLUS WIFI           | Plăci de bază           | ASUS            | 1099.99 |    8
+ TG-PSU-0001  | Sursă Seasonic Focus GX-750 750W 80+ Gold              | Surse                   | Seasonic        |  649.99 |   11
+ TG-LAP-0001  | Laptop Gaming Lenovo Legion 5 16" Ryzen 7 RTX 4060     | Laptopuri gaming        | Lenovo          | 6499.99 |    4
+ TG-LAP-0002  | Laptop Gaming Acer Nitro V 15 i5 RTX 4050              | Laptopuri gaming        | Acer            | 4299.99 |    6
+ TG-LAP-0003  | Laptop Lenovo IdeaPad Slim 3 15" Ryzen 5               | Laptopuri office        | Lenovo          | 2499.99 |   10
+ TG-PC-0001   | Sistem Desktop Gaming TECHGUARD Ryzen 5 / RTX 4060     | Desktop gaming          | MSI             | 4999.99 |    3
+ TG-CON-0001  | Consolă Sony PlayStation 5 Slim Digital Edition        | PlayStation             | Sony            | 2299.99 |    8
+ TG-CON-0002  | Consolă Microsoft Xbox Series S 512GB                  | Xbox                    | Microsoft       | 1399.99 |    6
+ TG-CON-0003  | Consolă Nintendo Switch OLED                           | Nintendo                | Nintendo        | 1599.99 |    7
+ TG-KB-0001   | Tastatură mecanică Logitech G Pro X TKL                | Tastaturi               | Logitech        |  899.99 |    9
+ TG-KB-0002   | Tastatură Razer BlackWidow V4 X                        | Tastaturi               | Razer           |  599.99 |    7
+ TG-MS-0001   | Mouse Logitech G502 X Plus Wireless                    | Mouse-uri               | Logitech        |  699.99 |   12
+ TG-MS-0002   | Mouse Razer DeathAdder V3                              | Mouse-uri               | Razer           |  349.99 |   20
+ TG-HS-0001   | Căști HyperX Cloud III                                 | Căști                   | HyperX          |  449.99 |   15
+ TG-MON-0001  | Monitor gaming LG UltraGear 27GR75Q 27" QHD 165Hz      | Monitoare               | LG              | 1399.99 |    6
+ TG-MON-0002  | Monitor Samsung Odyssey G5 32" curbat QHD 144Hz        | Monitoare               | Samsung         | 1299.99 |    4
+ TG-CTR-0001  | Controller Sony DualSense pentru PS5                   | Controllere             | Sony            |  349.99 |   18
+ TG-CTR-0002  | Controller Microsoft Xbox Wireless Controller          | Controllere             | Microsoft       |  299.99 |   14
+ TG-GAME-0001 | Cyberpunk 2077 Ultimate Edition (PC)                   | Jocuri PC               | CD Projekt Red  |  249.99 |   25
+ TG-GAME-0002 | Gran Turismo 7 (PS5)                                   | Jocuri PlayStation      | Sony            |  279.99 |   12
+ TG-GAME-0003 | The Legend of Zelda: Tears of the Kingdom (Switch)     | Jocuri Nintendo         | Nintendo        |  299.99 |   10
+ TG-ACC-0002  | Cooler procesor Arctic Freezer 36                      | Răcire și pastă termică | Arctic          |  159.99 |   16
+ TG-ACC-0001  | Pastă termică Arctic MX-6 4g                           | Răcire și pastă termică | Arctic          |   39.99 |   60
+ TG-ACC-0003  | Cablu HDMI 2.1 Ugreen 8K 2m                            | Cabluri și adaptoare    | Ugreen          |   59.99 |   40
+(36 rows)
+
+=== 5. Căutare în specificațiile JSONB: plăci video cu cel puțin 12 GB ===
+                        nume                        |            chipset            | memorie_gb |  pret   
+----------------------------------------------------+-------------------------------+------------+---------
+ Placă video ASUS Dual GeForce RTX 4070 SUPER 12GB  | NVIDIA GeForce RTX 4070 SUPER |         12 | 3399.99
+ Placă video MSI Radeon RX 7800 XT Gaming Trio 16GB | AMD Radeon RX 7800 XT         |         16 | 2899.99
+(2 rows)
+
+=== 6. Coșurile clienților (1:1 utilizator–coș, N:M coș–produse) ===
+     client      |                         produs                         | cantitate | valoare 
+-----------------+--------------------------------------------------------+-----------+---------
+ Bianca Neagu    | Căști HyperX Cloud III                                 |         1 |  449.99
+ Ioana Georgescu | Consolă Nintendo Switch OLED                           |         1 | 1599.99
+ Ioana Georgescu | The Legend of Zelda: Tears of the Kingdom (Switch)     |         1 |  299.99
+ Mihai Ionescu   | Monitor gaming LG UltraGear 27GR75Q 27" QHD 165Hz      |         1 | 1399.99
+ Mihai Ionescu   | Cablu HDMI 2.1 Ugreen 8K 2m                            |         2 |  119.98
+ Vlad Marin      | Memorie Kingston FURY Beast 32GB (2x16GB) DDR5 6000MHz |         1 |  549.99
+ Vlad Marin      | Placă de bază ASUS TUF GAMING B650-PLUS WIFI           |         1 | 1099.99
+ Vlad Marin      | Procesor AMD Ryzen 7 7800X3D                           |         1 | 1899.99
+(8 rows)
+
+=== 7. Comenzile, cu numărul de produse și totalul ===
+ numar_comanda |    data    |     client      |  status   | metoda_plata | nr_produse |  total  
+---------------+------------+-----------------+-----------+--------------+------------+---------
+ TG-2026-00001 | 2026-09-15 | Mihai Ionescu   | livrata   | card         |          2 | 4149.98
+ TG-2026-00002 | 2026-09-22 | Ana Dumitrescu  | livrata   | ramburs      |          3 | 2969.96
+ TG-2026-00003 | 2026-10-02 | Vlad Marin      | livrata   | card         |          2 | 7199.98
+ TG-2026-00004 | 2026-10-11 | Mihai Ionescu   | livrata   | transfer     |          3 | 1849.97
+ TG-2026-00005 | 2026-10-19 | Ioana Georgescu | anulata   | ramburs      |          1 | 1619.98
+ TG-2026-00006 | 2026-10-28 | Cristian Radu   | livrata   | card         |          6 | 2569.94
+ TG-2026-00007 | 2026-11-04 | Ana Dumitrescu  | expediata | card         |          2 |  799.98
+ TG-2026-00008 | 2026-11-09 | Bianca Neagu    | procesata | ramburs      |          2 | 1719.97
+ TG-2026-00009 | 2026-11-13 | Vlad Marin      | plasata   | card         |          2 | 1799.98
+ TG-2026-00010 | 2026-11-15 | Ioana Georgescu | plasata   | transfer     |          1 | 2499.99
+(10 rows)
+
+=== 8. Prețul de la cumpărare vs. prețul actual (de ce copiem prețul) ===
+ numar_comanda |                       nume                        | pret_platit | pret_actual 
+---------------+---------------------------------------------------+-------------+-------------
+ TG-2026-00001 | Placă video ASUS Dual GeForce RTX 4070 SUPER 12GB |     3499.99 |     3399.99
+ TG-2026-00002 | Gran Turismo 7 (PS5)                              |      299.99 |      279.99
+(2 rows)
+
+=== 9. Verificare consistență: stocul curent = suma mișcărilor de stoc (trebuie 0 rânduri) ===
+ id_produs | nume | stoc | suma_miscari 
+-----------+------+------+--------------
+(0 rows)
+
+=== 10. Verificare consistență: totalul comenzii = produse + transport (trebuie 0 rânduri) ===
+ numar_comanda | total | recalculat 
+---------------+-------+------------
+(0 rows)
+
+=== 11. Cereri de service: client, angajat (două FK spre utilizatori), serviciu ===
+  numar_cerere  |     client      |    angajat     |              serviciu              | tip_dispozitiv | marca_dispozitiv |    status    | cost_final 
+----------------+-----------------+----------------+------------------------------------+----------------+------------------+--------------+------------
+ SRV-2026-00001 | Mihai Ionescu   | Andrei Popa    | Curățare + schimbare pastă termică | laptop         | ASUS             | predata      |     150.00
+ SRV-2026-00002 | Ana Dumitrescu  | Elena Stan     | Reparație consolă                  | consola        | Sony             | predata      |     320.00
+ SRV-2026-00003 | Vlad Marin      | Andrei Popa    | Reinstalare sistem de operare      | calculator     | Asamblat         | finalizata   |     120.00
+ SRV-2026-00004 | Cristian Radu   | Elena Stan     | Reparație periferic                | periferic      | Sony             | finalizata   |      95.00
+ SRV-2026-00005 | Ioana Georgescu | Andrei Popa    | Înlocuire componentă defectă       | calculator     | HP               | in_lucru     |           
+ SRV-2026-00006 | Bianca Neagu    | Elena Stan     | Diagnosticare                      | laptop         | Lenovo           | in_lucru     |           
+ SRV-2026-00007 | Mihai Ionescu   | — nepreluată — | Reparație consolă                  | consola        | Nintendo         | inregistrata |           
+ SRV-2026-00008 | Ana Dumitrescu  | — nepreluată — | Curățare + schimbare pastă termică | consola        | Microsoft        | inregistrata |           
+(8 rows)
+
+=== 12. Cronologia unei reparații (cererea SRV-2026-00002) ===
+   data_modificare   |  status_nou  |  modificat_de  |                              comentariu                               
+---------------------+--------------+----------------+-----------------------------------------------------------------------
+ 2026-10-03 13:20:00 | inregistrata | Ana Dumitrescu | Cerere depusă online de client.
+ 2026-10-04 10:00:00 | in_lucru     | Elena Stan     | Diagnostic: port HDMI deteriorat. Cost estimat actualizat după piesă.
+ 2026-10-09 12:00:00 | finalizata   | Elena Stan     | Port HDMI înlocuit, consolă testată 2 ore.
+ 2026-10-10 17:30:00 | predata      | Elena Stan     | Ridicată de client din magazin.
+(4 rows)
+
+=== 13. Verificare consistență: status cerere = ultimul status din istoric (trebuie 0 rânduri) ===
+ numar_cerere | status | status_nou 
+--------------+--------+------------
+(0 rows)
+
+=== 14. Test constrângeri: aceste comenzi TREBUIE să dea eroare ===
+psql:sql/03_verificare.sql:111: ERROR:  new row for relation "produse" violates check constraint "produse_pret_check"
+DETAIL:  Failing row contains (38, 8, 3, TEST-1, Test preț negativ, null, -10.00, 0, 24, null, null, t, 2026-11-16 01:01:56.901309).
+psql:sql/03_verificare.sql:112: ERROR:  duplicate key value violates unique constraint "utilizatori_email_key"
+DETAIL:  Key (email)=(admin@techguard.ro) already exists.
+psql:sql/03_verificare.sql:114: ERROR:  new row for relation "comenzi" violates check constraint "comenzi_status_check"
+DETAIL:  Failing row contains (11, 4, TEST-1, 2026-11-16 01:01:56.902834, trimisa, card, 0.00, 0.00, x, x, x, x, null).
+psql:sql/03_verificare.sql:115: ERROR:  insert or update on table "produse" violates foreign key constraint "produse_id_categorie_fkey"
+DETAIL:  Key (id_categorie)=(999) is not present in table "categorii".
+psql:sql/03_verificare.sql:116: ERROR:  update or delete on table "marci" violates RESTRICT setting of foreign key constraint "produse_id_marca_fkey" on table "produse"
+DETAIL:  Key (id_marca)=(3) is referenced from table "produse".
