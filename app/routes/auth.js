@@ -10,6 +10,8 @@ const router = express.Router();
 
 // ---- LOGIN ----------------------------------------------------------
 router.get('/login', (req, res) => {
+  // ?next=/pagina → după autentificare revenim acolo (doar adrese interne, care încep cu „/”)
+  if (req.query.next && /^\/(?!\/)/.test(req.query.next)) req.session.dupaLogin = req.query.next;
   if (req.session.user) return res.redirect('/cont');
   res.render('auth/login', { titlu: 'Autentificare', email: '' });
 });

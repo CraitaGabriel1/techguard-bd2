@@ -45,34 +45,43 @@ router.get('/cos', doarClient, async (req, res, next) => {
 
 // CREATE / UPDATE: adaugă produs în coș (dacă există deja, crește cantitatea)
 router.post('/cos/adauga', async (req, res, next) => {
+  // Dacă cererea vine din JavaScript (fetch), răspundem cu JSON și pagina NU se reîncarcă;
+  // altfel (formular clasic) facem redirect, ca înainte.
+  const ajax = req.get('Accept') === 'application/json';
+  const raspunde = (tip, text, extra = {}, redirectClasic = inapoi(req)) => {
+    if (ajax) return res.json({ ok: tip === 'succes', tip, mesaj: text, ...extra });
+    req.session.flash = { tip, text };
+    res.redirect(extra.redirect || redirectClasic);
+  };
+
   try {
     const user = req.session.user;
     if (!user) {
-      req.session.flash = { tip: 'eroare', text: 'Autentifică-te ca să adaugi produse în coș.' };
       req.session.dupaLogin = inapoi(req);
-      return res.redirect('/login');
+      if (!ajax) req.session.flash = { tip: 'eroare', text: 'Autentifică-te ca să adaugi produse în coș.' };
+      return ajax ? res.json({ ok: false, redirect: '/login', mesaj: 'Autentifică-te ca să adaugi produse în coș.' })
+                  : res.redirect('/login');
     }
-    if (user.rol !== 'Client') {
-      req.session.flash = { tip: 'eroare', text: 'Doar clienții pot cumpăra. Folosește un cont de client.' };
-      return res.redirect(inapoi(req));
-    }
+    if (user.rol !== 'Client') return raspunde('eroare', 'Doar clienții pot cumpăra. Folosește un cont de client.');
 
     const idProdus = Number(req.body.id_produs);
     const cantitate = Math.max(1, parseInt(req.body.cantitate) || 1);
     const p = (await db.query('SELECT nume, stoc FROM produse WHERE id_produs = $1 AND activ', [idProdus])).rows[0];
-    if (!p || p.stoc < 1) {
-      req.session.flash = { tip: 'eroare', text: 'Produsul nu este în stoc.' };
-      return res.redirect(inapoi(req));
-    }
+    if (!p || p.stoc < 1) return raspunde('eroare', 'Produsul nu este în stoc.');
 
+    const id = await idCos(user.id);
     await db.query(`
       INSERT INTO cos_produse (id_cos, id_produs, cantitate) VALUES ($1, $2, LEAST($3::int, $4::int))
       ON CONFLICT (id_cos, id_produs)
       DO UPDATE SET cantitate = LEAST(cos_produse.cantitate + EXCLUDED.cantitate, $4::int)`,
-      [await idCos(user.id), idProdus, cantitate, p.stoc]);
+      [id, idProdus, cantitate, p.stoc]);
 
-    req.session.flash = { tip: 'succes', text: `„${p.nume}” a fost adăugat în coș.` };
-    res.redirect(req.body.redirect === 'cos' ? '/cos' : inapoi(req));
+    // Numărul nou de produse din coș (pentru bulina de lângă butonul Coș)
+    const nrCos = Number((await db.query(
+      'SELECT COALESCE(SUM(cantitate), 0) AS nr FROM cos_produse WHERE id_cos = $1', [id])).rows[0].nr);
+
+    raspunde('succes', `„${p.nume}” a fost adăugat în coș.`, { nrCos },
+      req.body.redirect === 'cos' ? '/cos' : inapoi(req));
   } catch (err) { next(err); }
 });
 
@@ -244,8 +253,15 @@ router.post('/service/cerere', doarClient, async (req, res, next) => {
     const { numar_cerere, id_cerere } = await op.creeazaCerereService(req.session.user.id, d);
     req.session.flash = { tip: 'succes', text: `Cererea ${numar_cerere} a fost înregistrată. Te contactăm în curând!` };
     res.redirect(`/cont/service/${id_cerere}`);
-  } catch (err) { next(err); }
+  } catch (err) {
+    if (err instanceof op.EroareUtilizator) {
+      req.session.flash = { tip: 'eroare', text: err.message };
+      return res.redirect('/service#cerere');
+    }
+    next(err);
+  }
 });
+router.get('/service/cerere', (req, res) => res.redirect('/service#cerere'));
 
 router.get('/cont/service', doarClient, async (req, res, next) => {
   try {

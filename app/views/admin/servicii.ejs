@@ -17,7 +17,7 @@
             <td><%= s.activ ? '✅' : '⛔' %></td>
             <td class="actions">
               <a href="?editeaza=<%= s.id_serviciu %>" class="btn-ghost btn-sm">Editează</a>
-              <form action="/admin/servicii/<%= s.id_serviciu %>/sterge" method="post" onsubmit="return confirm('Ștergi serviciul?')">
+              <form action="/admin/servicii/<%= s.id_serviciu %>/sterge" method="post" data-confirm="Ștergi serviciul?">
                 <button class="btn-danger btn-sm">Șterge</button>
               </form>
             </td>

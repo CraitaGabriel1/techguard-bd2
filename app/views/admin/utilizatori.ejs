@@ -31,7 +31,7 @@
           <td class="actions">
             <a href="/admin/utilizatori/<%= u.id_utilizator %>/editeaza" class="btn-ghost btn-sm">Editează</a>
             <% if (u.id_utilizator !== user.id) { %>
-              <form action="/admin/utilizatori/<%= u.id_utilizator %>/sterge" method="post" onsubmit="return confirm('Ștergi utilizatorul?')">
+              <form action="/admin/utilizatori/<%= u.id_utilizator %>/sterge" method="post" data-confirm="Ștergi utilizatorul?">
                 <button class="btn-danger btn-sm">Șterge</button>
               </form>
             <% } %>

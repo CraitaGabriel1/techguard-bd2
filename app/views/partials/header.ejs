@@ -9,16 +9,25 @@
   <title><%= titlu %> – TECHGUARD</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/style.css?v=<%= v %>">
 </head>
 <body>
 
 <!-- Bara de sus cu avantaje -->
 <div class="topbar">
-  <span>🚚 <b>Livrare gratuită</b> la comenzi peste 500 lei</span>
-  <span>🛡️ <b>Garanție</b> la fiecare produs</span>
-  <span>↩️ <b>14 zile</b> drept de retur</span>
-  <span>🔧 <b>Service TECHGUARD</b> pentru PC, laptop și console</span>
+  <span class="live-pill" title="Date reale, actualizate automat din baza de date">
+    <i class="live-dot"></i> LIVE <span class="live-text" id="live-text">TECHGUARD</span>
+  </span>
+  <%# Bandă care se derulează continuu (mesajele sunt dublate ca bucla să fie fără „salt”) %>
+  <div class="marquee"><div class="marquee-track">
+    <% for (let k = 0; k < 2; k++) { %>
+      <span>🚚 <b>Livrare gratuită</b> la comenzi peste 500 lei</span><i>•</i>
+      <span>🛡️ <b>Garanție</b> la fiecare produs</span><i>•</i>
+      <span>↩️ <b>14 zile</b> drept de retur</span><i>•</i>
+      <span>🔧 <b>Service TECHGUARD</b> pentru PC, laptop și console</span><i>•</i>
+      <span>🎮 <b>Console și jocuri</b> PlayStation, Xbox, Nintendo</span><i>•</i>
+    <% } %>
+  </div></div>
 </div>
 
 <header class="header">

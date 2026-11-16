@@ -53,6 +53,27 @@ router.get('/', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// Date pentru panoul principal, actualizate automat la câteva secunde (JSON)
+router.get('/api/live', async (req, res, next) => {
+  try {
+    const stat = (await db.query(`
+      SELECT
+        (SELECT COUNT(*) FROM produse WHERE activ)                                   AS produse_active,
+        (SELECT COUNT(*) FROM produse WHERE activ AND stoc <= 5)                     AS stoc_redus,
+        (SELECT COUNT(*) FROM comenzi WHERE status IN ('plasata', 'procesata'))      AS comenzi_de_procesat,
+        (SELECT COALESCE(SUM(total), 0) FROM comenzi WHERE status <> 'anulata'
+            AND data_comanda >= date_trunc('month', NOW()))                          AS vanzari_luna,
+        (SELECT COUNT(*) FROM cereri_service WHERE status IN ('inregistrata', 'in_lucru')) AS service_deschise,
+        (SELECT COUNT(*) FROM utilizatori u JOIN roluri r ON r.id_rol = u.id_rol
+            WHERE r.nume_rol = 'Client')                                             AS clienti`)).rows[0];
+    const comenzi = (await db.query(`
+      SELECT c.id_comanda, c.numar_comanda, c.status, c.total, u.prenume || ' ' || u.nume AS client
+      FROM comenzi c JOIN utilizatori u ON u.id_utilizator = c.id_utilizator
+      ORDER BY c.data_comanda DESC LIMIT 6`)).rows;
+    res.json({ stat, comenzi });
+  } catch (err) { next(err); }
+});
+
 // ======================= PRODUSE ====================================
 async function dateFormularProdus() {
   const categorii = (await db.query(`

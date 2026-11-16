@@ -26,13 +26,16 @@
         <div class="price big"><%= lei(produs.pret) %> <small>lei</small></div>
         <span class="muted small">TVA inclus</span>
       </div>
-      <% if (produs.stoc <= 0) { %>
-        <span class="stock out">● Stoc epuizat</span>
-      <% } else if (produs.stoc <= 5) { %>
-        <span class="stock low">● Ultimele <%= produs.stoc %> bucăți</span>
-      <% } else { %>
-        <span class="stock ok">● În stoc</span>
-      <% } %>
+      <div class="stock-live" data-live-stoc="<%= produs.id_produs %>">
+        <% if (produs.stoc <= 0) { %>
+          <span class="stock out"><i class="live-dot red"></i> Stoc epuizat</span>
+        <% } else if (produs.stoc <= 5) { %>
+          <span class="stock low"><i class="live-dot orange"></i> Ultimele <b><%= produs.stoc %></b> bucăți</span>
+        <% } else { %>
+          <span class="stock ok"><i class="live-dot"></i> În stoc · <b><%= produs.stoc %></b> buc.</span>
+        <% } %>
+        <span class="muted small sold-line" hidden>🔥 Vândut de <b class="sold-nr">0</b> ori</span>
+      </div>
     </div>
 
     <% if (produs.stoc > 0) { %>

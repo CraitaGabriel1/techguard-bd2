@@ -37,7 +37,7 @@
           <td class="actions">
             <a href="/admin/produse/<%= p.id_produs %>/editeaza" class="btn-ghost btn-sm">Editează</a>
             <a href="/admin/stoc?produs=<%= p.id_produs %>" class="btn-ghost btn-sm">Stoc</a>
-            <form action="/admin/produse/<%= p.id_produs %>/sterge" method="post" onsubmit="return confirm('Ștergi produsul „<%= p.nume.replace(/'/g, '') %>”?')">
+            <form action="/admin/produse/<%= p.id_produs %>/sterge" method="post" data-confirm="Ștergi produsul „<%= p.nume %>”?">
               <button class="btn-danger btn-sm">Șterge</button>
             </form>
           </td>

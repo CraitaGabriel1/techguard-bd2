@@ -29,6 +29,8 @@ app.use(session({
 }));
 
 // ---- Funcții ajutătoare disponibile în toate paginile .ejs ----------
+// Versiune pentru CSS/JS: se schimbă la fiecare pornire, ca browserul să nu folosească fișiere vechi din cache
+app.locals.v = Date.now();
 app.locals.lei = (x) => Number(x || 0).toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 app.locals.data = (d) => d ? new Date(d).toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—';
 app.locals.dataOra = (d) => d ? new Date(d).toLocaleString('ro-RO', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';

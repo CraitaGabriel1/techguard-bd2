@@ -389,5 +389,394 @@ body.admin .table tr:hover td { background: #f8f9fc; }
 @media (max-width: 800px) { .logo-img { height: 36px; } }
 
 /* ---------- Imaginile produselor (public/img/produse) ---------- */
-.product-img img, .product-gallery img, .cart-img img { padding: 0; object-fit: cover; }
+.product-img img, .product-gallery img, .cart-img img { padding: 0; object-fit: contain; }
 .product-gallery { overflow: hidden; }
+
+/* =====================================================================
+   ANIMAȚII ȘI INTERACȚIUNI (folosite de public/js/app.js)
+   ===================================================================== */
+
+/* ---------- Apariție la scroll ---------- */
+.reveal { opacity: 0; transform: translateY(22px); }
+.reveal.visible { opacity: 1; transform: none;
+  transition: opacity .55s ease var(--delay, 0ms), transform .55s cubic-bezier(.2,.7,.2,1) var(--delay, 0ms); }
+.card.reveal.visible:hover { transform: translateY(-4px); transition-delay: 0ms; }
+
+/* ---------- Carduri de produs: ridicare, strălucire, zoom pe poză ---------- */
+.card { transition: border-color .25s, transform .25s, box-shadow .25s; }
+.product-card:hover, .cat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0,0,0,.45), 0 0 0 1px var(--accent), 0 0 24px color-mix(in srgb, var(--accent) 25%, transparent); }
+.product-img { overflow: hidden; }
+.product-img img { transition: transform .45s ease, opacity .5s ease; }
+.product-card:hover .product-img img { transform: scale(1.06); }
+.product-img img, .product-gallery img, .cart-img img { opacity: 0; }
+.product-img img.loaded, .product-gallery img.loaded, .cart-img img.loaded { opacity: 1; }
+.btn-accent, .btn-ghost, .btn-danger, .btn-cart, .pill { transition: background .2s, border-color .2s, transform .15s, box-shadow .2s; }
+.btn-accent:active, .btn-cart:active { transform: scale(.96); }
+.btn-accent:hover { box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 45%, transparent); }
+
+/* ---------- Butonul „Adaugă” și coșul ---------- */
+.btn-accent.loading { opacity: .7; pointer-events: none; }
+.btn-accent.added { background: var(--success); animation: pop .35s ease; }
+.btn-cart.bump { animation: bump .5s ease; }
+.btn-cart.bump .cart-count { animation: pop .5s ease; }
+@keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.25); } 100% { transform: scale(1); } }
+@keyframes bump { 0%,100% { transform: none; } 25% { transform: translateY(-4px) rotate(-6deg); } 50% { transform: translateY(0) rotate(5deg); } 75% { transform: rotate(-3deg); } }
+
+/* ---------- Banner principal animat ---------- */
+.hero { position: relative; overflow: hidden; background-size: 200% 200%; animation: hero-bg 14s ease-in-out infinite alternate; }
+.hero::after { content: ''; position: absolute; width: 420px; height: 420px; right: -80px; top: -120px; border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 35%, transparent), transparent 70%);
+  animation: float 9s ease-in-out infinite; pointer-events: none; }
+.hero > * { position: relative; z-index: 1; }
+.hero .tag, .hero h1, .hero p, .hero .hero-btns { animation: fade-up .8s cubic-bezier(.2,.7,.2,1) both; }
+.hero h1 { animation-delay: .12s; } .hero p { animation-delay: .24s; } .hero .hero-btns { animation-delay: .36s; }
+.hero h1 .accent { background: linear-gradient(90deg, var(--accent), #7ff4ff, var(--accent)); background-size: 200% auto;
+  -webkit-background-clip: text; background-clip: text; color: transparent; animation: shine 4s linear infinite; }
+@keyframes hero-bg { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
+@keyframes float { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-60px, 50px); } }
+@keyframes fade-up { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@keyframes shine { to { background-position: 200% center; } }
+
+/* ---------- Notificări toast ---------- */
+.toast-zone { position: fixed; right: 20px; bottom: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; max-width: 380px; }
+.toast { display: flex; align-items: center; gap: 12px; padding: 13px 14px 13px 16px; border-radius: 14px;
+  background: #151922; color: #eef1f7; border: 1px solid #2a3040; box-shadow: 0 14px 40px rgba(0,0,0,.5);
+  font-size: 14px; animation: toast-in .4s cubic-bezier(.2,.8,.2,1); }
+.toast.out { animation: toast-out .3s ease forwards; }
+.toast-icon { flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; color: #fff; }
+.toast-succes .toast-icon { background: var(--success); } .toast-eroare .toast-icon { background: var(--danger); } .toast-info .toast-icon { background: var(--accent); }
+.toast-succes { border-left: 3px solid var(--success); } .toast-eroare { border-left: 3px solid var(--danger); } .toast-info { border-left: 3px solid var(--accent); }
+.toast span:nth-child(2) { flex: 1; }
+.toast button { background: none; border: none; color: #8b93a7; font-size: 20px; cursor: pointer; line-height: 1; }
+@keyframes toast-in { from { opacity: 0; transform: translateX(40px) scale(.96); } to { opacity: 1; transform: none; } }
+@keyframes toast-out { to { opacity: 0; transform: translateX(40px); } }
+
+/* ---------- Căutare live ---------- */
+.search { position: relative; }
+.search-results { display: none; position: absolute; left: 0; right: 0; top: calc(100% + 8px); z-index: 70;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0,0,0,.6); }
+.search-results.open { display: block; animation: fade-up .2s ease; }
+.sr-item { display: grid; grid-template-columns: 56px 1fr auto; gap: 12px; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+.sr-item:hover, .sr-item.active { background: var(--surface-2); }
+.sr-img { width: 56px; height: 42px; border-radius: 8px; overflow: hidden; background: var(--surface-2); }
+.sr-img img { width: 100%; height: 100%; object-fit: cover; }
+.sr-info { display: flex; flex-direction: column; min-width: 0; }
+.sr-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sr-name mark { background: none; color: var(--accent); }
+.sr-meta { font-size: 12px; color: var(--muted); }
+.sr-price { font-weight: 800; white-space: nowrap; }
+.sr-price small { font-size: 11px; }
+.sr-all, .sr-empty { display: block; padding: 12px 14px; font-size: 14px; color: var(--accent); font-weight: 600; }
+.sr-all:hover, .sr-all.active { background: var(--surface-2); }
+.sr-empty { color: var(--muted); font-weight: 500; }
+
+/* ---------- Mega-meniu și dropdown cu animație ---------- */
+.mega:hover .mega-panel, .dropdown:hover .dropdown-panel { animation: fade-up .2s ease; }
+
+/* ---------- Cine preferă fără animații (setare de sistem) ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .reveal { opacity: 1; transform: none; }
+}
+
+/* =====================================================================
+   ELEMENTE „LIVE”
+   ===================================================================== */
+.live-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--success); position: relative; flex: none; }
+.live-dot::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: inherit; animation: ping 1.6s cubic-bezier(0,0,.2,1) infinite; }
+.live-dot.red { background: var(--danger); } .live-dot.orange { background: #f5a623; }
+@keyframes ping { 0% { transform: scale(1); opacity: .8; } 80%,100% { transform: scale(2.8); opacity: 0; } }
+
+/* Banda LIVE din bara de sus */
+.topbar { align-items: center; }
+.live-pill { display: inline-flex; align-items: center; gap: 8px; padding: 3px 12px; border-radius: 999px; font-weight: 800; font-size: 12px;
+  color: #ff4d5e; background: #ff4d5e18; border: 1px solid #ff4d5e40; letter-spacing: .5px; }
+.live-pill .live-dot { background: #ff4d5e; }
+.live-text { color: var(--text); font-weight: 600; letter-spacing: 0; min-width: 230px; display: inline-block; transition: opacity .25s, transform .25s; }
+.live-text.swap { opacity: 0; transform: translateY(-6px); }
+
+/* Fereastra „activitate recentă” (stânga-jos) */
+.activity { position: fixed; left: 20px; bottom: 20px; z-index: 900; width: 360px; display: grid; grid-template-columns: 64px 1fr auto; gap: 12px;
+  align-items: center; padding: 12px; border-radius: 16px; background: #151922; border: 1px solid #2a3040; box-shadow: 0 16px 40px rgba(0,0,0,.55);
+  opacity: 0; transform: translateY(30px) scale(.97); pointer-events: none; transition: opacity .45s, transform .45s cubic-bezier(.2,.8,.2,1); }
+.activity.show { opacity: 1; transform: none; pointer-events: auto; }
+.act-img { width: 64px; height: 48px; border-radius: 10px; overflow: hidden; background: var(--surface-2); }
+.act-img img { width: 100%; height: 100%; object-fit: cover; }
+.act-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; font-size: 13px; }
+.act-who { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+.act-who b { color: var(--text); }
+.act-prod { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.act-prod:hover { color: var(--accent); }
+.act-time { font-size: 11px; color: var(--muted); }
+.act-close { align-self: start; background: none; border: none; color: #8b93a7; font-size: 18px; cursor: pointer; }
+
+/* Stocul live de pe pagina produsului */
+.stock-live { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; padding: 6px 10px; border-radius: 10px; }
+.stock-live .stock { display: inline-flex; align-items: center; gap: 8px; }
+.stock-live.changed { animation: glow 1.4s ease; }
+@keyframes glow { 0% { background: color-mix(in srgb, var(--accent) 35%, transparent); } 100% { background: transparent; } }
+
+/* Panoul de administrare live */
+.live-badge { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; letter-spacing: .5px;
+  padding: 4px 12px; border-radius: 999px; color: #e5354a; background: #ff4d5e14; border: 1px solid #ff4d5e40; }
+.live-badge .live-dot { background: #ff4d5e; }
+.live-updated { font-weight: 500; font-size: 13px; }
+.stat.flash-update { animation: stat-flash 1.2s ease; }
+@keyframes stat-flash { 0% { box-shadow: 0 0 0 2px var(--accent), 0 0 24px color-mix(in srgb, var(--accent) 50%, transparent); } 100% { box-shadow: 0 1px 3px rgba(20,30,60,.06); } }
+tr.row-new td { animation: row-in 2.4s ease; }
+@keyframes row-in { 0% { background: color-mix(in srgb, var(--accent) 30%, transparent); opacity: 0; } 15% { opacity: 1; } 100% { background: transparent; } }
+@media (max-width: 900px) { .activity { left: 10px; right: 10px; width: auto; } .live-text { min-width: 0; } }
+
+/* =====================================================================
+   FERESTRE ANIMATE: confirmare, meniuri, sugestii, intrarea paginii
+   ===================================================================== */
+
+/* ---------- Fereastra de confirmare ---------- */
+.modal-backdrop { position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; padding: 20px;
+  background: rgba(5, 8, 14, 0); backdrop-filter: blur(0); transition: background .25s, backdrop-filter .25s; }
+.modal-backdrop.open { background: rgba(5, 8, 14, .6); backdrop-filter: blur(6px); }
+.modal { width: 100%; max-width: 400px; padding: 28px; border-radius: 20px; text-align: center;
+  background: #151922; color: #eef1f7; border: 1px solid #2a3040; box-shadow: 0 30px 80px rgba(0,0,0,.6);
+  opacity: 0; transform: translateY(24px) scale(.92); transition: opacity .25s, transform .3s cubic-bezier(.2,.9,.3,1.2); }
+.modal-backdrop.open .modal { opacity: 1; transform: none; }
+.modal-backdrop.closing .modal { opacity: 0; transform: translateY(10px) scale(.96); transition-duration: .2s; }
+.modal h3 { font-size: 20px; margin: 14px 0 6px; }
+.modal p { color: #a3abbd; font-size: 15px; }
+.modal-icon { width: 58px; height: 58px; margin: 0 auto; border-radius: 50%; display: grid; place-items: center;
+  font-size: 28px; font-weight: 800; color: #fff; background: var(--accent); animation: pop .5s .1s both; }
+.modal-icon.danger { background: var(--danger); box-shadow: 0 0 0 8px #ff4d5e22; }
+.modal-actions { display: flex; gap: 10px; margin-top: 22px; }
+.modal-actions button { flex: 1; padding: 11px; }
+.modal .btn-ghost { color: #eef1f7; border-color: #2a3040; }
+.btn-danger-solid { background: var(--danger); color: #fff; border: none; border-radius: 10px; font: inherit; font-weight: 700; cursor: pointer; transition: filter .2s, transform .15s; }
+.btn-danger-solid:hover { filter: brightness(1.1); } .btn-danger-solid:active { transform: scale(.96); }
+.modal.shake { animation: shake .4s ease; }
+@keyframes shake { 20%,60% { transform: translateX(-8px); } 40%,80% { transform: translateX(8px); } }
+
+/* ---------- Mega-meniul „Toate categoriile” – se deschide și se închide animat ---------- */
+.mega-panel { display: grid !important; opacity: 0; visibility: hidden; transform: translateY(12px) scale(.98); transform-origin: top left;
+  transition: opacity .22s ease, transform .25s cubic-bezier(.2,.8,.2,1), visibility 0s .25s; animation: none !important; }
+.mega:hover .mega-panel, .mega:focus-within .mega-panel { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+.mega-col { opacity: 0; transform: translateY(8px); transition: opacity .3s, transform .3s; }
+.mega:hover .mega-col, .mega:focus-within .mega-col { opacity: 1; transform: none; }
+.mega:hover .mega-col:nth-child(2) { transition-delay: .04s; } .mega:hover .mega-col:nth-child(3) { transition-delay: .08s; }
+.mega:hover .mega-col:nth-child(4) { transition-delay: .12s; } .mega:hover .mega-col:nth-child(5) { transition-delay: .16s; }
+.mega:hover .mega-col:nth-child(6) { transition-delay: .2s; }
+.mega-col a:not(.mega-title) { transition: color .15s, transform .15s; }
+.mega-col a:not(.mega-title):hover { transform: translateX(4px); }
+
+/* ---------- Meniul contului ---------- */
+.dropdown-panel { display: block !important; opacity: 0; visibility: hidden; transform: translateY(10px); transform-origin: top right;
+  transition: opacity .2s, transform .22s cubic-bezier(.2,.8,.2,1), visibility 0s .22s; animation: none !important; }
+.dropdown:hover .dropdown-panel, .dropdown:focus-within .dropdown-panel { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+.dropdown-panel a, .dropdown-panel button { transition: background .15s, color .15s, padding-left .15s; }
+.dropdown-panel a:hover, .dropdown-panel button:hover { padding-left: 22px; }
+
+/* ---------- Sugestiile de căutare ---------- */
+.search-results { display: block !important; opacity: 0; visibility: hidden; transform: translateY(-6px);
+  transition: opacity .18s, transform .2s, visibility 0s .2s; animation: none !important; }
+.search-results.open { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+.search-results.open .sr-item { animation: fade-up .25s ease both; }
+.search-results.open .sr-item:nth-child(2) { animation-delay: .03s; } .search-results.open .sr-item:nth-child(3) { animation-delay: .06s; }
+.search-results.open .sr-item:nth-child(4) { animation-delay: .09s; } .search-results.open .sr-item:nth-child(5) { animation-delay: .12s; }
+.search-results.open .sr-item:nth-child(6) { animation-delay: .15s; }
+
+/* ---------- Intrarea paginii ---------- */
+main.container, .admin-main { animation: page-in .45s ease both; }
+@keyframes page-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* ---------- Bara de filtre și cardul sumar „plutesc” ușor la încărcare ---------- */
+.filters, .summary, .form-card, .auth-card { animation: fade-up .5s cubic-bezier(.2,.7,.2,1) both; }
+
+/* =====================================================================
+   STIL „QWERTYKEY / MEDCOMPONENTS”: bandă derulantă, banner rotativ,
+   categorii cu imagine, rânduri de produse glisante
+   ===================================================================== */
+
+/* ---------- Bara de sus: LIVE fix + bandă care se derulează ---------- */
+.topbar { flex-wrap: nowrap; gap: 18px; padding: 7px 24px; overflow: hidden; }
+.topbar .live-pill { flex: none; }
+.marquee { flex: 1; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
+.marquee-track { display: inline-flex; gap: 28px; white-space: nowrap; animation: marquee 38s linear infinite; }
+.marquee-track i { color: var(--accent); font-style: normal; }
+.marquee:hover .marquee-track { animation-play-state: paused; }
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* ---------- Slider generic ---------- */
+.slider { position: relative; }
+.slider-track { display: grid; grid-auto-flow: column; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory;
+  scroll-behavior: smooth; scrollbar-width: none; padding: 6px 2px 14px; cursor: grab; }
+.slider-track::-webkit-scrollbar { display: none; }
+.slider-track > * { scroll-snap-align: start; }
+.slider-track.dragging { cursor: grabbing; scroll-snap-type: none; scroll-behavior: auto; }
+.slider-track.dragging * { pointer-events: none; }
+.slider-btn { position: absolute; top: 50%; transform: translateY(-50%); z-index: 5; width: 46px; height: 46px; border-radius: 50%;
+  border: 1px solid var(--border); background: rgba(19,22,30,.85); color: var(--text); font-size: 26px; line-height: 1;
+  cursor: pointer; backdrop-filter: blur(6px); box-shadow: 0 8px 20px rgba(0,0,0,.4); transition: opacity .25s, transform .2s, background .2s, border-color .2s; }
+.slider-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; transform: translateY(-50%) scale(1.08); }
+.slider-btn.prev { left: -18px; } .slider-btn.next { right: -18px; }
+.slider-btn.hidden { opacity: 0; pointer-events: none; }
+.slider-dots { display: flex; justify-content: center; gap: 8px; margin-top: 4px; }
+.slider-dots button { width: 8px; height: 8px; border-radius: 999px; border: none; background: var(--border); cursor: pointer; padding: 0;
+  transition: width .3s, background .3s; }
+.slider-dots button.active { width: 28px; background: var(--accent); }
+
+/* Rânduri de produse */
+.product-slider .slider-track { grid-auto-columns: 250px; }
+.product-slider .slider-btn { top: 42%; }
+
+/* ---------- Bannerul rotativ ---------- */
+.hero-carousel { margin-top: 24px; }
+.hero-carousel .slider-track { grid-auto-columns: 300px; padding-bottom: 10px; }
+.hero-carousel .slider-btn { top: 46%; }
+.hc-card { position: relative; height: 420px; border-radius: 24px; overflow: hidden; border: 1px solid var(--border);
+  display: flex; flex-direction: column; isolation: isolate; }
+.hc-promo { width: 460px; padding: 40px 34px; justify-content: center; gap: 14px;
+  background: radial-gradient(circle at 85% 15%, color-mix(in srgb, var(--accent) 40%, transparent), transparent 55%),
+              linear-gradient(140deg, #13202a, #0d1017 70%); background-size: 160% 160%; animation: hero-bg 12s ease-in-out infinite alternate; }
+.hero-carousel .slider-track { grid-auto-columns: auto; }
+.hc-promo h1 { font-size: 34px; line-height: 1.15; }
+.hc-promo p { color: var(--muted); }
+.hc-promo .tag, .hc-promo h1, .hc-promo p, .hc-promo .hero-btns { animation: fade-up .8s cubic-bezier(.2,.7,.2,1) both; }
+.hc-promo h1 { animation-delay: .1s; } .hc-promo p { animation-delay: .2s; } .hc-promo .hero-btns { animation-delay: .3s; }
+.hc-promo h1 .accent { background: linear-gradient(90deg, var(--accent), #7ff4ff, var(--accent)); background-size: 200% auto;
+  -webkit-background-clip: text; background-clip: text; color: transparent; animation: shine 4s linear infinite; }
+.hc-product { width: 300px; padding: 18px; background: linear-gradient(180deg, #161b25, #0b0d12); }
+.hc-product::before { content: ''; position: absolute; inset: 0; z-index: -1;
+  background: radial-gradient(circle at 50% 62%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 55%);
+  opacity: .7; transition: opacity .4s; }
+.hc-product:hover::before { opacity: 1; }
+.hc-product:hover { border-color: var(--accent); }
+.hc-label { align-self: flex-start; font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
+.hc-stage { position: relative; flex: 1; display: grid; place-items: center; }
+.hc-stage img { position: relative; z-index: 1; width: 100%; max-height: 190px; object-fit: contain;
+  animation: hover-float 4s ease-in-out infinite; animation-delay: calc(var(--i, 0) * -.7s); transition: transform .4s; }
+.hc-product:hover .hc-stage img { transform: scale(1.08); }
+/* „Piedestalul” cu neon de sub produs – inspirat de medcomponents */
+.hc-pedestal { position: absolute; bottom: 18px; left: 50%; width: 78%; height: 34px; transform: translateX(-50%);
+  border-radius: 50%; border: 2px solid var(--accent);
+  box-shadow: 0 0 18px var(--accent), inset 0 0 18px color-mix(in srgb, var(--accent) 60%, transparent);
+  background: radial-gradient(ellipse, color-mix(in srgb, var(--accent) 35%, transparent), transparent 70%);
+  animation: pedestal 2.6s ease-in-out infinite; }
+.hc-info h3 { font-size: 16px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.6em; }
+.hc-buy { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+.hc-buy .price { font-size: 20px; }
+.hc-buy .btn-accent { padding: 7px 12px !important; font-size: 13px; }
+@keyframes hover-float { 0%,100% { translate: 0 0; } 50% { translate: 0 -10px; } }
+@keyframes pedestal { 0%,100% { opacity: .75; box-shadow: 0 0 14px var(--accent), inset 0 0 14px color-mix(in srgb, var(--accent) 50%, transparent); }
+                      50% { opacity: 1; box-shadow: 0 0 30px var(--accent), inset 0 0 22px color-mix(in srgb, var(--accent) 70%, transparent); } }
+
+/* ---------- Categorii cu imagine ---------- */
+.cat-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.cat-tile { position: relative; height: 190px; overflow: hidden; padding: 20px 22px;
+  background: radial-gradient(circle at 80% 80%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 60%), var(--surface); }
+.cat-tile-text { position: relative; z-index: 2; display: flex; flex-direction: column; gap: 4px; max-width: 60%; }
+.cat-tile h3 { font-size: 20px; }
+.cat-tile-img { position: absolute; right: -10px; bottom: -14px; width: 62%; z-index: 1;
+  -webkit-mask-image: radial-gradient(ellipse at 55% 55%, #000 45%, transparent 72%);
+  mask-image: radial-gradient(ellipse at 55% 55%, #000 45%, transparent 72%);
+  transition: transform .45s cubic-bezier(.2,.8,.2,1); }
+.cat-tile:hover .cat-tile-img { transform: scale(1.1) rotate(-2deg); }
+.cat-arrow { position: absolute; left: 22px; bottom: 18px; z-index: 2; width: 38px; height: 38px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--surface-2); border: 1px solid var(--border); transition: background .25s, transform .25s, width .25s; }
+.cat-tile:hover .cat-arrow { background: var(--accent); border-color: var(--accent); color: #fff; transform: translateX(6px); }
+
+@media (max-width: 900px) {
+  .cat-tiles { grid-template-columns: 1fr 1fr; }
+  .hc-promo { width: 86vw; } .hc-product { width: 70vw; }
+  .slider-btn { display: none; }
+}
+/* ajustări banner / slidere */
+.hc-promo .tag { align-self: flex-start; }
+.hc-stage img { -webkit-mask-image: radial-gradient(ellipse 58% 60% at 50% 50%, #000 55%, transparent 100%);
+  mask-image: radial-gradient(ellipse 58% 60% at 50% 50%, #000 55%, transparent 100%); }
+.product-slider .slider-track { grid-auto-columns: 272px; }
+.product-slider .product-foot .btn-accent { white-space: nowrap; }
+
+/* ---------- Slidere: animație cursivă + bară de progres ---------- */
+.slider-track.animating { scroll-snap-type: none; scroll-behavior: auto; }
+.slider-track { scroll-behavior: auto; }
+.slider-btn:active { transform: translateY(-50%) scale(.9); }
+.slider-btn::after { content: ''; position: absolute; inset: -1px; border-radius: 50%; border: 2px solid var(--accent); opacity: 0; transform: scale(1); }
+.slider-btn:active::after { animation: ring .5s ease-out; }
+@keyframes ring { from { opacity: .9; transform: scale(1); } to { opacity: 0; transform: scale(1.6); } }
+.slider-progress { height: 3px; margin: 6px auto 0; max-width: 260px; border-radius: 3px; background: var(--border); overflow: hidden; }
+.slider-progress i { display: block; height: 100%; background: var(--accent); border-radius: 3px; box-shadow: 0 0 10px var(--accent);
+  transition: transform .12s linear, width .3s; }
+.slider-track > .reveal.visible { transition-duration: .45s; }
+
+/* ---------- Pagina de service: carduri care aleg serviciul ---------- */
+.service-pick { text-align: left; font: inherit; color: inherit; cursor: pointer; position: relative; }
+.sp-icon { font-size: 28px; }
+.sp-cta { margin-top: 8px; font-size: 14px; font-weight: 700; color: var(--accent); opacity: 0; transform: translateX(-6px); transition: opacity .25s, transform .25s; }
+.service-pick:hover .sp-cta { opacity: 1; transform: none; }
+.service-pick.picked { animation: pop .45s ease; border-color: var(--accent); }
+
+/* ---------- Formularul în 4 pași ---------- */
+.wizard { padding: 28px; overflow: hidden; }
+.wizard:hover { transform: none; border-color: var(--border); }
+.wizard.shake { animation: shake .4s ease; }
+.wz-head h2 { margin-bottom: 18px; }
+.wz-steps { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.wz-steps li { display: flex; align-items: center; gap: 10px; color: var(--muted); font-weight: 600; font-size: 14px; cursor: pointer; transition: color .3s; }
+.wz-steps li span { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; flex: none;
+  background: var(--surface-2); border: 1px solid var(--border); transition: background .3s, border-color .3s, transform .3s, box-shadow .3s; }
+.wz-steps li.active { color: var(--text); }
+.wz-steps li.active span { background: var(--accent); border-color: var(--accent); color: #fff; transform: scale(1.1);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 20%, transparent); }
+.wz-steps li.done span { background: color-mix(in srgb, var(--accent) 20%, transparent); border-color: var(--accent); color: var(--accent); font-size: 0; }
+.wz-steps li.done span::after { content: '✓'; font-size: 15px; font-weight: 800; }
+.wz-progress { height: 4px; border-radius: 4px; background: var(--border); margin: 16px 0 6px; overflow: hidden; }
+.wz-progress i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), #7ff4ff);
+  box-shadow: 0 0 12px var(--accent); transition: width .6s cubic-bezier(.65,0,.35,1); }
+
+.wz-viewport { overflow: hidden; transition: height .5s cubic-bezier(.65,0,.35,1); }
+.wizard:not(.js) .wz-track { display: block; }
+.wz-track { display: flex; transition: transform .6s cubic-bezier(.65,0,.35,1); }
+.wz-step { flex: 0 0 100%; min-width: 0; border: none; padding: 22px 2px 6px; opacity: .25; transition: opacity .5s; align-self: flex-start; }
+.wz-step.active { opacity: 1; }
+.wizard:not(.js) .wz-step { opacity: 1; }
+.wz-step legend { font-size: 18px; font-weight: 700; margin-bottom: 16px; padding: 0; float: left; width: 100%; }
+.wz-step legend + * { clear: both; }
+
+.opt-grid { display: grid; gap: 12px; }
+.opt-4 { grid-template-columns: repeat(4, 1fr); } .opt-3 { grid-template-columns: repeat(3, 1fr); }
+.opt { cursor: pointer; }
+.opt input { position: absolute; opacity: 0; pointer-events: none; }
+.opt-box { position: relative; height: 100%; display: flex; flex-direction: column; gap: 6px; padding: 18px; border-radius: 16px;
+  background: var(--surface-2); border: 1.5px solid var(--border); transition: border-color .25s, transform .25s, box-shadow .25s, background .25s; }
+.opt-box small { color: var(--muted); font-size: 13px; line-height: 1.4; }
+.opt-meta { margin-top: auto; padding-top: 6px; font-size: 13px; color: var(--muted); }
+.opt-icon { font-size: 30px; transition: transform .35s cubic-bezier(.2,.9,.3,1.4); }
+.opt:hover .opt-box { transform: translateY(-3px); border-color: color-mix(in srgb, var(--accent) 60%, var(--border)); }
+.opt:hover .opt-icon { transform: scale(1.15) rotate(-6deg); }
+.opt input:checked + .opt-box { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--surface-2));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent), 0 10px 30px rgba(0,0,0,.35); }
+.opt input:focus-visible + .opt-box { outline: 2px solid var(--accent); outline-offset: 2px; }
+.opt-check { position: absolute; top: 12px; right: 12px; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
+  font-style: normal; font-size: 13px; font-weight: 800; color: #fff; background: var(--accent); opacity: 0; transform: scale(.3); transition: opacity .25s, transform .35s cubic-bezier(.2,.9,.3,1.6); }
+.opt input:checked + .opt-box .opt-check { opacity: 1; transform: scale(1); }
+
+.wz-summary { display: flex; flex-direction: column; gap: 2px; max-width: 640px; }
+.sum-row { display: flex; justify-content: space-between; gap: 20px; padding: 11px 0; border-bottom: 1px solid var(--border); font-size: 15px; }
+.sum-row span { color: var(--muted); } .sum-row b { text-align: right; }
+.sum-row.big { font-size: 18px; }
+.wz-summary .muted { margin-top: 10px; }
+.wz-login { margin-top: 18px; padding: 18px; border-radius: 14px; border: 1px dashed var(--accent); background: color-mix(in srgb, var(--accent) 7%, transparent); }
+.wz-login .hero-btns { margin-top: 12px; }
+
+.wz-nav { display: flex; align-items: center; gap: 14px; margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--border); }
+.wz-error { flex: 1; text-align: center; color: #f5a623; font-size: 14px; font-weight: 600; }
+.wz-nav .btn-accent, .wz-nav .btn-ghost { padding: 12px 22px; }
+.btn-send { animation: pop .4s ease; }
+@media (max-width: 900px) { .opt-4, .opt-3 { grid-template-columns: 1fr 1fr; } .wz-steps li { font-size: 0; gap: 0; justify-content: center; } }
+
+a.service-item { transition: border-color .2s, transform .2s, background .2s; }
+a.service-item:hover { border-color: var(--accent); transform: translateX(6px); }
+
+[hidden] { display: none !important; }

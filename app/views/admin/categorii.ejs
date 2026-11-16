@@ -16,7 +16,7 @@
             <td class="right"><%= c.nr_produse %></td>
             <td class="actions">
               <a href="?editeaza=<%= c.id_categorie %>" class="btn-ghost btn-sm">Editează</a>
-              <form action="/admin/categorii/<%= c.id_categorie %>/sterge" method="post" onsubmit="return confirm('Ștergi categoria?')">
+              <form action="/admin/categorii/<%= c.id_categorie %>/sterge" method="post" data-confirm="Ștergi categoria?">
                 <button class="btn-danger btn-sm">Șterge</button>
               </form>
             </td>

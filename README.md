@@ -24,16 +24,22 @@ periferice, jocuri), cu zonă proprie de **service** pentru mentenanță și rep
 | 6 – Susținere | Prezentare finală | ⏳ | – |
 
 ## Funcționalități
-**Magazin (oricine):** prima pagină cu categorii și „de la X lei”, cele mai vândute produse, catalog cu filtre
-(stoc, preț, marcă), sortare și paginare, căutare, pagina produsului cu specificații tehnice (JSONB), pagina de service.
+**Magazin (oricine):** prima pagină cu banner rotativ și categorii cu „de la X lei”, rânduri glisante cu cele mai
+vândute produse și noutăți, catalog cu filtre (stoc, preț, marcă), sortare și paginare, **căutare cu sugestii live**,
+pagina produsului cu specificații tehnice (JSONB) și **stoc actualizat în timp real**.
 
-**Client:** cont nou și autentificare, coș de cumpărături, plasarea comenzii (tranzacție), istoricul comenzilor,
-anularea unei comenzi „plasate”, cereri de service cu istoricul reparației, editarea datelor și a parolei.
+**Client:** cont nou și autentificare, coș de cumpărături (adăugare fără reîncărcarea paginii), plasarea comenzii
+(tranzacție), istoricul comenzilor, anularea unei comenzi „plasate”, **cerere de service în 4 pași**
+(dispozitiv → serviciu → detalii → confirmare, cu cost și dată estimată), istoricul reparației, editarea datelor și a parolei.
 
-**Angajat:** panou de administrare – produse, stocuri (mișcări de stoc), mărci, comenzi (schimbare status),
-cereri de service (tehnician, status, costuri).
+**Angajat:** panou de administrare **LIVE** (statistici și comenzi noi actualizate automat la 5 secunde),
+produse, stocuri (mișcări de stoc), mărci, comenzi (schimbare status), cereri de service (tehnician, status, costuri).
 
 **Administrator:** tot ce face angajatul + categorii, servicii și utilizatori (roluri, blocare cont).
+
+**Interfață:** temă întunecată cu accent turcoaz (identitatea TechGuard), animații la scroll, slidere cu animație
+cursivă, bandă derulantă și indicatori LIVE (date reale din BD), notificări toast, ferestre de confirmare proprii,
+meniuri animate, derulare lină a paginii.
 
 ## Capturi de ecran
 | Catalog | Pagina produsului |
@@ -43,8 +49,10 @@ cereri de service (tehnician, status, costuri).
 | ![Coș](docs/screenshots/05_cos.jpg) | ![Comandă](docs/screenshots/06_comanda_client.jpg) |
 | **Panou de administrare** | **Administrare produse** |
 | ![Admin](docs/screenshots/07_admin_panou.jpg) | ![Produse](docs/screenshots/08_admin_produse.jpg) |
-| **Cerere de service (admin)** | **Utilizatori** |
-| ![Service](docs/screenshots/09_admin_service.jpg) | ![Utilizatori](docs/screenshots/10_admin_utilizatori.jpg) |
+| **Cerere de service – 4 pași** | **Cerere de service (admin)** |
+| ![Service](docs/screenshots/04_service.jpg) | ![Service admin](docs/screenshots/09_admin_service.jpg) |
+| **Utilizatori** | |
+| ![Utilizatori](docs/screenshots/10_admin_utilizatori.jpg) | |
 
 ## Structura proiectului
 ```
@@ -62,7 +70,7 @@ PROIECT BD/
 │   ├── lib/operatii.js               ← operații în tranzacții (comandă, stoc, service)
 │   ├── middleware/auth.js            ← verificarea rolurilor
 │   ├── views/                        ← paginile (EJS): magazin, cont, admin, partials
-│   └── public/                       ← CSS, logo, imaginile produselor
+│   └── public/                       ← CSS, JavaScript (animații, live), logo, imaginile produselor
 ├── database/                         ← baza de date PostgreSQL
 │   ├── 01_schema.sql                 ← creează cele 13 tabele
 │   ├── 02_date_test.sql              ← datele de test (fixtures)
@@ -76,7 +84,8 @@ PROIECT BD/
 └── scripts/                          ← scripturi de lucru (dublu-click)
     ├── ruleaza_etapa1.bat            ← creează și populează baza de date
     ├── porneste_site.bat             ← pornește site-ul (http://localhost:3000)
-    └── publica_github.bat            ← urcă modificările pe GitHub
+    ├── publica_github.bat            ← urcă modificările pe GitHub (cere un mesaj)
+    └── publica_rapid.bat             ← urcă modificările pe GitHub fără întrebări
 ```
 
 ## Instalare și pornire

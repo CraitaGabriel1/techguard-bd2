@@ -61,3 +61,27 @@ Browser  ──cerere HTTP──►  Express (routes/*.js)  ──SQL──►  
 - **`CHECK`** – stoc ≥ 0, preț ≥ 0, statusuri permise.
 - **Tranzacții** – plasarea comenzii, anularea, mișcările de stoc, cererile de service.
 - **Prețul istoric** – `detalii_comanda.pret_unitar` păstrează prețul de la momentul cumpărării.
+
+## Interactivitate și animații (`public/js/app.js`)
+- **Căutare live** – în timp ce scrii, apar sugestii (poză, preț, stoc). Browserul cere `GET /api/cautare?q=...`, iar serverul rulează un `SELECT ... WHERE nume ILIKE '%q%' LIMIT 6` și răspunde în format JSON.
+- **Adaugă în coș fără reîncărcare** – formularul este trimis cu `fetch`; serverul face `INSERT ... ON CONFLICT DO UPDATE` în `cos_produse` și întoarce numărul nou de produse din coș.
+- **Notificări toast**, **apariția elementelor la scroll**, **efecte la hover** pe carduri, **banner animat** și **contoare animate** în panoul de administrare.
+- Animațiile se dezactivează automat dacă sistemul utilizatorului are setarea „reducere mișcare”.
+
+## Elemente „LIVE” (date reale, actualizate automat)
+| Element | Unde | Endpoint (JSON) | Interogarea din spate |
+|---|---|---|---|
+| Banda **LIVE** din bara de sus | toate paginile | `GET /api/live` (la 20 s) | `COUNT`/`SUM` pe `produse`, `comenzi`, `cereri_service` |
+| „X din Y a comandat…” | magazin, stânga-jos | `GET /api/activitate` | ultimele 10 comenzi + primul produs (`JOIN LATERAL`) |
+| Stoc + „Vândut de N ori” | pagina produsului | `GET /api/stoc/:id` (la 8 s) | `produse.stoc` + `SUM(cantitate)` din `detalii_comanda` |
+| Panou admin **LIVE** | `/admin` | `GET /admin/api/live` (la 5 s) | statisticile + ultimele 6 comenzi |
+
+**Demonstrație la susținere:** deschide panoul de admin într-o fereastră și plasează o comandă ca client în altă fereastră. În maximum 5 secunde comanda apare singură în panou, cu notificare, iar cifrele se actualizează animat.
+
+## Cererea de service în 4 pași (`/service`)
+1. **Dispozitiv** – calculator, laptop, consolă sau periferic (coloana `tip_dispozitiv`, validată de un `CHECK` în BD).
+2. **Serviciu** – opțiunile vin din tabela `servicii` (preț estimativ, durată).
+3. **Detalii** – marcă, model, serie, descrierea problemei.
+4. **Confirmare** – rezumat, cost estimat și data estimată (azi + `durata_estimata_zile`).
+
+La trimitere se execută o **tranzacție**: `INSERT` în `cereri_service` (numărul `SRV-AAAA-NNNNN` generat din secvență, `cost_estimat` preluat din `servicii.pret_estimativ`) și primul rând în `istoric_service`. Un vizitator poate completa pașii, iar după autentificare revine cu alegerile păstrate.

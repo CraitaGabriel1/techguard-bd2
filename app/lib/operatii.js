@@ -143,13 +143,16 @@ async function creeazaCerereService(idClient, d) {
     const { rows } = await client.query(`
       WITH n AS (SELECT nextval(pg_get_serial_sequence('cereri_service', 'id_cerere')) AS id)
       INSERT INTO cereri_service (id_cerere, numar_cerere, id_client, id_serviciu, tip_dispozitiv,
-                                  marca_dispozitiv, model_dispozitiv, serie_dispozitiv, descriere_problema)
+                                  marca_dispozitiv, model_dispozitiv, serie_dispozitiv, descriere_problema, cost_estimat)
       SELECT n.id, 'SRV-' || EXTRACT(YEAR FROM NOW()) || '-' || LPAD(n.id::text, 5, '0'),
-             $1, $2, $3, $4, $5, $6, $7
+             $1, s.id_serviciu, $3, $4, $5, $6, $7,
+             s.pret_estimativ                       -- costul estimat pornește de la prețul serviciului ales
       FROM n
+      JOIN servicii s ON s.id_serviciu = $2 AND s.activ
       RETURNING id_cerere, numar_cerere`,
       [idClient, d.id_serviciu, d.tip_dispozitiv, d.marca_dispozitiv, d.model_dispozitiv || null,
        d.serie_dispozitiv || null, d.descriere_problema]);
+    if (!rows.length) throw new EroareUtilizator('Serviciul ales nu mai este disponibil.');
 
     await client.query(`
       INSERT INTO istoric_service (id_cerere, id_utilizator, status_nou, comentariu)

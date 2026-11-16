@@ -20,7 +20,9 @@ router.get('/', async (req, res, next) => {
     const categorii = await db.query(`
       SELECT p.nume, p.slug, p.descriere,
              COUNT(pr.id_produs) AS nr_produse,
-             MIN(pr.pret)        AS pret_minim
+             MIN(pr.pret)        AS pret_minim,
+             -- imaginea celui mai scump produs din categorie (pentru card)
+             (ARRAY_AGG(pr.imagine_url ORDER BY pr.pret DESC) FILTER (WHERE pr.imagine_url IS NOT NULL))[1] AS imagine
       FROM categorii p
       LEFT JOIN categorii c ON c.id_parinte = p.id_categorie OR c.id_categorie = p.id_categorie
       LEFT JOIN produse pr  ON pr.id_categorie = c.id_categorie AND pr.activ
@@ -50,8 +52,21 @@ router.get('/', async (req, res, next) => {
       ORDER BY p.data_adaugare DESC, p.id_produs DESC
       LIMIT 8`);
 
+    // Bannerul rotativ: cel mai scump produs din stoc, din fiecare categorie principală
+    const vedete = await db.query(`
+      SELECT * FROM (
+        SELECT DISTINCT ON (COALESCE(c.id_parinte, c.id_categorie))
+               ${COLOANE_CARD}, p.descriere, rad.nume AS categorie_principala
+        FROM produse p
+        JOIN marci m       ON m.id_marca = p.id_marca
+        JOIN categorii c   ON c.id_categorie = p.id_categorie
+        JOIN categorii rad ON rad.id_categorie = COALESCE(c.id_parinte, c.id_categorie)
+        WHERE p.activ AND p.stoc > 0
+        ORDER BY COALESCE(c.id_parinte, c.id_categorie), p.pret DESC
+      ) t ORDER BY pret DESC LIMIT 5`);
+
     const servicii = await db.query(`
-      SELECT nume, pret_estimativ FROM servicii WHERE activ ORDER BY id_serviciu LIMIT 4`);
+      SELECT id_serviciu, nume, pret_estimativ FROM servicii WHERE activ ORDER BY id_serviciu LIMIT 4`);
 
     res.render('index', {
       titlu: 'Acasă',
@@ -59,6 +74,7 @@ router.get('/', async (req, res, next) => {
       topVanzari: topVanzari.rows,
       noutati: noutati.rows,
       servicii: servicii.rows,
+      vedete: vedete.rows,
     });
   } catch (err) { next(err); }
 });
@@ -181,11 +197,79 @@ router.get('/produs/:id', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// ---- CĂUTARE LIVE (sugestii sub bara de căutare, răspuns JSON) ----
+// Apelată din public/js/app.js pe măsură ce utilizatorul scrie.
+router.get('/api/cautare', async (req, res, next) => {
+  try {
+    const q = (req.query.q || '').trim();
+    if (q.length < 2) return res.json([]);
+    const { rows } = await db.query(`
+      SELECT p.id_produs, p.nume, p.pret, p.stoc, p.imagine_url, m.nume AS marca
+      FROM produse p JOIN marci m ON m.id_marca = p.id_marca
+      WHERE p.activ AND (p.nume ILIKE $1 OR m.nume ILIKE $1 OR p.cod_produs ILIKE $1)
+      ORDER BY p.stoc = 0, p.nume
+      LIMIT 6`, [`%${q}%`]);
+    res.json(rows);
+  } catch (err) { next(err); }
+});
+
+// ---- DATE „LIVE” (JSON) – citite periodic de public/js/app.js ----
+// Activitatea recentă: ultimele comenzi reale (numele clientului e prescurtat)
+router.get('/api/activitate', async (req, res, next) => {
+  try {
+    const { rows } = await db.query(`
+      SELECT c.id_comanda, c.data_comanda, c.oras_livrare AS oras,
+             u.prenume || ' ' || LEFT(u.nume, 1) || '.' AS client,
+             p.id_produs, p.nume AS produs, p.imagine_url
+      FROM comenzi c
+      JOIN utilizatori u ON u.id_utilizator = c.id_utilizator
+      JOIN LATERAL (                       -- primul produs din fiecare comandă
+        SELECT d.id_produs FROM detalii_comanda d
+        WHERE d.id_comanda = c.id_comanda ORDER BY d.pret_unitar DESC LIMIT 1
+      ) d1 ON TRUE
+      JOIN produse p ON p.id_produs = d1.id_produs
+      WHERE c.status <> 'anulata'
+      ORDER BY c.data_comanda DESC
+      LIMIT 10`);
+    res.json(rows);
+  } catch (err) { next(err); }
+});
+
+// Cifrele din banda „LIVE” de sus
+router.get('/api/live', async (req, res, next) => {
+  try {
+    const { rows } = await db.query(`
+      SELECT
+        (SELECT COUNT(*) FROM comenzi WHERE status <> 'anulata'
+           AND data_comanda >= NOW() - INTERVAL '7 days')                    AS comenzi_7zile,
+        (SELECT COALESCE(SUM(stoc), 0) FROM produse WHERE activ)             AS bucati_stoc,
+        (SELECT COUNT(*) FROM produse WHERE activ AND stoc > 0)              AS produse_disponibile,
+        (SELECT COUNT(*) FROM cereri_service WHERE status = 'in_lucru')      AS reparatii_in_lucru,
+        (SELECT MAX(data_comanda) FROM comenzi)                              AS ultima_comanda`);
+    res.json(rows[0]);
+  } catch (err) { next(err); }
+});
+
+// Stocul unui produs (pagina produsului îl actualizează singură)
+router.get('/api/stoc/:id', async (req, res, next) => {
+  try {
+    const { rows } = await db.query(`
+      SELECT p.stoc,
+             (SELECT COALESCE(SUM(d.cantitate), 0) FROM detalii_comanda d
+              JOIN comenzi c ON c.id_comanda = d.id_comanda AND c.status <> 'anulata'
+              WHERE d.id_produs = p.id_produs) AS vandute
+      FROM produse p WHERE p.id_produs = $1`, [req.params.id]);
+    res.json(rows[0] || {});
+  } catch (err) { next(err); }
+});
+
 // ---- SERVICE --------------------------------------------------------
 router.get('/service', async (req, res, next) => {
   try {
     const servicii = await db.query('SELECT * FROM servicii WHERE activ ORDER BY id_serviciu');
-    res.render('service', { titlu: 'Service TECHGUARD', servicii: servicii.rows, date: {} });
+    // ?serviciu=2&tip=laptop → formularul pornește cu aceste opțiuni deja alese
+    res.render('service', { titlu: 'Service TECHGUARD', servicii: servicii.rows,
+      ales: { serviciu: Number(req.query.serviciu) || null, tip: req.query.tip || null } });
   } catch (err) { next(err); }
 });
 

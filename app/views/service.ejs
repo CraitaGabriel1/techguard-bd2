@@ -1,16 +1,33 @@
 <%- include('partials/header') %>
+<%
+  const DISPOZITIVE = [
+    { val: 'calculator', nume: 'Calculator', icon: '🖥️', info: 'PC desktop, sistem gaming sau office' },
+    { val: 'laptop',     nume: 'Laptop',     icon: '💻', info: 'Orice marcă: ASUS, Lenovo, HP, Acer...' },
+    { val: 'consola',    nume: 'Consolă',    icon: '🎮', info: 'PlayStation, Xbox, Nintendo Switch' },
+    { val: 'periferic',  nume: 'Periferic',  icon: '🎧', info: 'Controller, tastatură, mouse, căști' },
+  ];
+  const ICON_SERVICIU = ['🔍', '🧼', '💿', '🔩', '🎮', '🎧', '🛠️', '⚙️'];
+  const esteClient = user && user.rol === 'Client';
+%>
 
 <section class="hero small-hero">
   <span class="tag">🔧 Service TECHGUARD</span>
   <h1>Reparații și mentenanță pentru <span class="accent">PC, laptop și console</span></h1>
-  <p>Trimite cererea online, iar noi te ținem la curent cu fiecare etapă: înregistrată → în lucru → finalizată → predată.</p>
+  <p>Alege dispozitivul și serviciul dorit, descrie problema și urmărești online fiecare etapă: înregistrată → în lucru → finalizată → predată.</p>
+  <div class="hero-btns"><a href="#cerere" class="btn-accent btn-lg">Programează acum →</a></div>
 </section>
 
 <section class="section">
-  <h2>Serviciile noastre</h2>
+  <div class="section-head">
+    <div>
+      <h2>Serviciile noastre</h2>
+      <p>Apasă pe un serviciu ca să-l alegi direct în formular.</p>
+    </div>
+  </div>
   <div class="grid-cat">
-    <% servicii.forEach(s => { %>
-      <div class="card cat-card">
+    <% servicii.forEach((s, i) => { %>
+      <button type="button" class="card cat-card service-pick" data-alege-serviciu="<%= s.id_serviciu %>">
+        <span class="sp-icon"><%= ICON_SERVICIU[i % ICON_SERVICIU.length] %></span>
         <h3><%= s.nume %></h3>
         <p><%= s.descriere %></p>
         <div class="cat-foot">
@@ -18,47 +35,123 @@
           <span class="price"><%= lei(s.pret_estimativ) %> <small>lei</small></span>
           <span class="badge">~<%= s.durata_estimata_zile %> zile</span>
         </div>
-      </div>
+        <span class="sp-cta">Alege serviciul →</span>
+      </button>
     <% }) %>
   </div>
 </section>
 
+<!-- ================= CERERE ÎN 4 PAȘI ================= -->
 <section class="section" id="cerere">
-  <div class="card form-card">
-    <h2>Trimite o cerere de service</h2>
-    <% if (!user) { %>
-      <p class="muted">Pentru a trimite o cerere și a urmări reparația, ai nevoie de un cont.</p>
-      <div class="hero-btns">
-        <a href="/login" class="btn-accent">Intră în cont</a>
-        <a href="/inregistrare" class="btn-ghost">Creează cont</a>
+  <% if (user && !esteClient) { %>
+    <div class="card form-card">
+      <h2>Cerere de service</h2>
+      <p class="muted">Ești autentificat ca <b><%= user.rol %></b>. Cererile se gestionează din
+        <a href="/admin/service" class="accent">panoul de administrare</a>.</p>
+    </div>
+  <% } else { %>
+  <form action="/service/cerere" method="post" class="card wizard" id="wizard" novalidate>
+    <div class="wz-head">
+      <h2>Programează o reparație</h2>
+      <ol class="wz-steps">
+        <li class="active"><span>1</span>Dispozitiv</li>
+        <li><span>2</span>Serviciu</li>
+        <li><span>3</span>Detalii</li>
+        <li><span>4</span>Confirmare</li>
+      </ol>
+      <div class="wz-progress"><i></i></div>
+    </div>
+
+    <div class="wz-viewport">
+      <div class="wz-track">
+
+        <!-- PAS 1: dispozitivul -->
+        <fieldset class="wz-step" data-pas="1">
+          <legend>Ce dispozitiv aduci în service?</legend>
+          <div class="opt-grid opt-4">
+            <% DISPOZITIVE.forEach(d => { %>
+              <label class="opt">
+                <input type="radio" name="tip_dispozitiv" value="<%= d.val %>" required <%= ales.tip === d.val ? 'checked' : '' %>>
+                <span class="opt-box">
+                  <span class="opt-icon"><%= d.icon %></span>
+                  <b><%= d.nume %></b>
+                  <small><%= d.info %></small>
+                  <i class="opt-check">✓</i>
+                </span>
+              </label>
+            <% }) %>
+          </div>
+        </fieldset>
+
+        <!-- PAS 2: serviciul (din tabela servicii) -->
+        <fieldset class="wz-step" data-pas="2">
+          <legend>Ce dorești să facem?</legend>
+          <div class="opt-grid opt-3">
+            <% servicii.forEach((s, i) => { %>
+              <label class="opt">
+                <input type="radio" name="id_serviciu" value="<%= s.id_serviciu %>" required
+                       data-nume="<%= s.nume %>" data-pret="<%= s.pret_estimativ %>" data-zile="<%= s.durata_estimata_zile %>"
+                       <%= ales.serviciu === s.id_serviciu ? 'checked' : '' %>>
+                <span class="opt-box">
+                  <span class="opt-icon"><%= ICON_SERVICIU[i % ICON_SERVICIU.length] %></span>
+                  <b><%= s.nume %></b>
+                  <small><%= s.descriere %></small>
+                  <span class="opt-meta"><b class="accent">de la <%= lei(s.pret_estimativ) %> lei</b> · ~<%= s.durata_estimata_zile %> zile</span>
+                  <i class="opt-check">✓</i>
+                </span>
+              </label>
+            <% }) %>
+          </div>
+        </fieldset>
+
+        <!-- PAS 3: detaliile dispozitivului -->
+        <fieldset class="wz-step" data-pas="3">
+          <legend>Spune-ne mai multe despre dispozitiv</legend>
+          <div class="form grid-2">
+            <label>Marcă *<input name="marca_dispozitiv" placeholder="ex: ASUS, Sony, Lenovo" maxlength="60" required></label>
+            <label>Model<input name="model_dispozitiv" placeholder="ex: TUF Gaming F15" maxlength="100"></label>
+            <label class="span-2">Serie <small class="muted">(opțional, o găsești pe eticheta dispozitivului)</small><input name="serie_dispozitiv" maxlength="50"></label>
+            <label class="span-2">Descrierea problemei *
+              <textarea name="descriere_problema" rows="4" placeholder="Ce nu funcționează? De când? Ce ai încercat deja?" required></textarea>
+            </label>
+          </div>
+        </fieldset>
+
+        <!-- PAS 4: rezumat -->
+        <fieldset class="wz-step" data-pas="4">
+          <legend>Verifică și trimite cererea</legend>
+          <div class="wz-summary">
+            <div class="sum-row"><span>Dispozitiv</span><b data-sum="dispozitiv">—</b></div>
+            <div class="sum-row"><span>Serviciu</span><b data-sum="serviciu">—</b></div>
+            <div class="sum-row"><span>Marcă / model</span><b data-sum="model">—</b></div>
+            <div class="sum-row"><span>Problema</span><b data-sum="problema">—</b></div>
+            <div class="sum-row big"><span>Cost estimat</span><b class="accent" data-sum="pret">—</b></div>
+            <div class="sum-row"><span>Gata, estimativ, până pe</span><b data-sum="data">—</b></div>
+            <p class="muted small">Costul final îl confirmă tehnicianul după diagnosticare. Primești fiecare actualizare în „Cererile mele de service”.</p>
+          </div>
+          <% if (!user) { %>
+            <div class="wz-login">
+              <p>Ca să trimiți cererea și să urmărești reparația, intră în cont. Alegerile tale se păstrează.</p>
+              <div class="hero-btns">
+                <a href="/login" class="btn-accent" data-login-next>Intră în cont</a>
+                <a href="/inregistrare" class="btn-ghost">Creează cont</a>
+              </div>
+            </div>
+          <% } %>
+        </fieldset>
       </div>
-    <% } else if (user.rol !== 'Client') { %>
-      <p class="muted">Ești autentificat ca <b><%= user.rol %></b>. Cererile se gestionează din <a href="/admin/service" class="accent">panoul de administrare</a>.</p>
-    <% } else { %>
-      <form action="/service/cerere" method="post" class="form grid-2">
-        <label>Serviciu *
-          <select name="id_serviciu" required>
-            <% servicii.forEach(s => { %><option value="<%= s.id_serviciu %>"><%= s.nume %> (de la <%= lei(s.pret_estimativ) %> lei)</option><% }) %>
-          </select>
-        </label>
-        <label>Tip dispozitiv *
-          <select name="tip_dispozitiv" required>
-            <option value="calculator">Calculator</option>
-            <option value="laptop">Laptop</option>
-            <option value="consola">Consolă</option>
-            <option value="periferic">Periferic</option>
-          </select>
-        </label>
-        <label>Marcă *<input name="marca_dispozitiv" placeholder="ex: ASUS, Sony" required></label>
-        <label>Model<input name="model_dispozitiv" placeholder="ex: TUF Gaming F15"></label>
-        <label class="span-2">Serie (opțional)<input name="serie_dispozitiv"></label>
-        <label class="span-2">Descrierea problemei *
-          <textarea name="descriere_problema" rows="4" placeholder="Ce nu funcționează? De când?" required></textarea>
-        </label>
-        <button class="btn-accent btn-lg span-2">Trimite cererea</button>
-      </form>
-    <% } %>
-  </div>
+    </div>
+
+    <div class="wz-nav">
+      <button type="button" class="btn-ghost" data-wz="inapoi">← Înapoi</button>
+      <span class="wz-error" aria-live="polite"></span>
+      <button type="button" class="btn-accent" data-wz="inainte">Continuă →</button>
+      <% if (esteClient) { %>
+        <button type="submit" class="btn-accent btn-send" data-wz="trimite">✓ Trimite cererea</button>
+      <% } %>
+    </div>
+  </form>
+  <% } %>
 </section>
 
 <%- include('partials/footer') %>

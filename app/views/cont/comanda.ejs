@@ -40,7 +40,7 @@
     <p><span class="muted">Telefon:</span> <%= comanda.telefon_contact %></p>
     <% if (comanda.observatii) { %><p><span class="muted">Observații:</span> <%= comanda.observatii %></p><% } %>
     <% if (comanda.status === 'plasata') { %>
-      <form action="/cont/comenzi/<%= comanda.id_comanda %>/anuleaza" method="post" onsubmit="return confirm('Sigur vrei să anulezi comanda?')">
+      <form action="/cont/comenzi/<%= comanda.id_comanda %>/anuleaza" method="post" data-confirm="Sigur vrei să anulezi comanda?">
         <button class="btn-danger btn-block">Anulează comanda</button>
       </form>
     <% } %>

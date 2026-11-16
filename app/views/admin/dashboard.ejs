@@ -1,22 +1,25 @@
 <%- include('_header') %>
 
-<h1 class="page-title">Bun venit, <%= user.prenume %>!</h1>
+<h1 class="page-title">Bun venit, <%= user.prenume %>!
+  <span class="live-badge" title="Panoul se actualizează automat la fiecare 5 secunde"><i class="live-dot"></i> LIVE</span>
+  <span class="muted small live-updated" id="live-updated"></span>
+</h1>
 
 <div class="stats">
-  <a href="/admin/produse" class="card stat"><span class="muted">Produse active</span><b><%= stat.produse_active %></b></a>
-  <a href="/admin/produse?stare=stoc_redus" class="card stat warn"><span class="muted">Stoc redus (≤ 5)</span><b><%= stat.stoc_redus %></b></a>
-  <a href="/admin/comenzi" class="card stat"><span class="muted">Comenzi de procesat</span><b><%= stat.comenzi_de_procesat %></b></a>
-  <div class="card stat"><span class="muted">Vânzări luna aceasta</span><b><%= lei(stat.vanzari_luna) %> lei</b></div>
-  <a href="/admin/service" class="card stat"><span class="muted">Cereri service deschise</span><b><%= stat.service_deschise %></b></a>
-  <div class="card stat"><span class="muted">Clienți</span><b><%= stat.clienti %></b></div>
+  <a href="/admin/produse" class="card stat"><span class="muted">Produse active</span><b data-live="produse_active"><%= stat.produse_active %></b></a>
+  <a href="/admin/produse?stare=stoc_redus" class="card stat warn"><span class="muted">Stoc redus (≤ 5)</span><b data-live="stoc_redus"><%= stat.stoc_redus %></b></a>
+  <a href="/admin/comenzi" class="card stat"><span class="muted">Comenzi de procesat</span><b data-live="comenzi_de_procesat"><%= stat.comenzi_de_procesat %></b></a>
+  <div class="card stat"><span class="muted">Vânzări luna aceasta</span><b data-live="vanzari_luna"><%= lei(stat.vanzari_luna) %> lei</b></div>
+  <a href="/admin/service" class="card stat"><span class="muted">Cereri service deschise</span><b data-live="service_deschise"><%= stat.service_deschise %></b></a>
+  <div class="card stat"><span class="muted">Clienți</span><b data-live="clienti"><%= stat.clienti %></b></div>
 </div>
 
 <div class="two-cols">
   <div class="card">
     <div class="card-head"><h3>Ultimele comenzi</h3><a href="/admin/comenzi" class="small accent">Toate →</a></div>
-    <table class="table">
+    <table class="table" id="live-comenzi">
       <% ultimeleComenzi.forEach(c => { %>
-        <tr>
+        <tr data-id="<%= c.id_comanda %>">
           <td><a href="/admin/comenzi/<%= c.id_comanda %>"><b><%= c.numar_comanda %></b></a><br><span class="muted small"><%= c.client %></span></td>
           <td><span class="status s-<%= c.status %>"><%= STATUS_COMANDA[c.status] %></span></td>
           <td class="right"><b><%= lei(c.total) %></b></td>

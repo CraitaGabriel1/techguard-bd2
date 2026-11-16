@@ -16,7 +16,7 @@
             <td class="right"><%= m.nr_produse %></td>
             <td class="actions">
               <a href="?editeaza=<%= m.id_marca %>" class="btn-ghost btn-sm">Editează</a>
-              <form action="/admin/marci/<%= m.id_marca %>/sterge" method="post" onsubmit="return confirm('Ștergi marca?')">
+              <form action="/admin/marci/<%= m.id_marca %>/sterge" method="post" data-confirm="Ștergi marca?">
                 <button class="btn-danger btn-sm">Șterge</button>
               </form>
             </td>
