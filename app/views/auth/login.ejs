@@ -1,0 +1,31 @@
+<%- include('../partials/header') %>
+
+<section class="auth-wrap">
+  <div class="card auth-card">
+    <h1>Intră în cont</h1>
+    <p class="muted">Autentifică-te ca să cumperi, să urmărești comenzile sau să administrezi magazinul.</p>
+
+    <form action="/login" method="post" class="form">
+      <label>Email
+        <input type="email" name="email" value="<%= email %>" required autofocus>
+      </label>
+      <label>Parolă
+        <input type="password" name="parola" required>
+      </label>
+      <button class="btn-accent btn-lg btn-block">Intră în cont</button>
+    </form>
+
+    <p class="center muted">Nu ai cont? <a href="/inregistrare" class="accent">Creează unul acum</a></p>
+
+    <details class="demo">
+      <summary>Conturi de test (Parola123!)</summary>
+      <ul>
+        <li><b>Administrator</b> – admin@techguard.ro</li>
+        <li><b>Angajat</b> – andrei.popa@techguard.ro</li>
+        <li><b>Client</b> – mihai.ionescu@gmail.com</li>
+      </ul>
+    </details>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,79 @@
+<%- include('partials/header') %>
+
+<nav class="breadcrumb">
+  <a href="/">Acasă</a> ›
+  <% if (produs.categorie_parinte) { %><a href="/categorie/<%= produs.categorie_parinte_slug %>"><%= produs.categorie_parinte %></a> ›<% } %>
+  <a href="/categorie/<%= produs.categorie_slug %>"><%= produs.categorie %></a> ›
+  <span><%= produs.nume %></span>
+</nav>
+
+<div class="product-page">
+  <div class="card product-gallery">
+    <span class="img-placeholder big"><%= produs.marca.slice(0, 2).toUpperCase() %></span>
+    <% if (produs.imagine_url) { %><img src="<%= produs.imagine_url %>" alt="" onerror="this.remove()"><% } %>
+  </div>
+
+  <div class="product-info">
+    <div class="row-between">
+      <span class="brand-tag"><%= produs.marca %></span>
+      <span class="muted small">Cod: <%= produs.cod_produs %></span>
+    </div>
+    <h1><%= produs.nume %></h1>
+    <p class="muted"><%= produs.descriere %></p>
+
+    <div class="row-between buy-row">
+      <div>
+        <div class="price big"><%= lei(produs.pret) %> <small>lei</small></div>
+        <span class="muted small">TVA inclus</span>
+      </div>
+      <% if (produs.stoc <= 0) { %>
+        <span class="stock out">● Stoc epuizat</span>
+      <% } else if (produs.stoc <= 5) { %>
+        <span class="stock low">● Ultimele <%= produs.stoc %> bucăți</span>
+      <% } else { %>
+        <span class="stock ok">● În stoc</span>
+      <% } %>
+    </div>
+
+    <% if (produs.stoc > 0) { %>
+      <form action="/cos/adauga" method="post" class="buy-form">
+        <input type="hidden" name="id_produs" value="<%= produs.id_produs %>">
+        <input type="number" name="cantitate" value="1" min="1" max="<%= produs.stoc %>">
+        <button class="btn-accent btn-lg">🛒 Adaugă în coș</button>
+        <button class="btn-ghost btn-lg" name="redirect" value="cos">Cumpără acum</button>
+      </form>
+    <% } %>
+
+    <div class="perks">
+      <div class="card perk">🚚 <div><b>Livrare în 24–48h</b><span class="muted small">Gratuită peste 500 lei</span></div></div>
+      <div class="card perk">🛡️ <div><b>Garanție <%= produs.garantie_luni %> luni</b><span class="muted small">Inclusiv service propriu</span></div></div>
+      <div class="card perk">↩️ <div><b>Retur 14 zile</b><span class="muted small">Fără întrebări</span></div></div>
+    </div>
+  </div>
+</div>
+
+<% if (produs.specificatii && Object.keys(produs.specificatii).length) { %>
+  <section class="section">
+    <h2>Specificații tehnice</h2>
+    <%# Specificațiile sunt salvate în coloana JSONB "specificatii" %>
+    <table class="table specs card">
+      <% for (const [cheie, valoare] of Object.entries(produs.specificatii)) { %>
+        <tr>
+          <td><%= cheie.replace(/_/g, ' ').replace(/^./, c => c.toUpperCase()) %></td>
+          <td><b><%= Array.isArray(valoare) ? valoare.join(', ') : (valoare === true ? 'Da' : valoare === false ? 'Nu' : valoare) %></b></td>
+        </tr>
+      <% } %>
+    </table>
+  </section>
+<% } %>
+
+<% if (similare.length) { %>
+  <section class="section">
+    <h2>Produse similare</h2>
+    <div class="grid-products">
+      <% similare.forEach(p => { %><%- include('partials/produs-card', { p }) %><% }) %>
+    </div>
+  </section>
+<% } %>
+
+<%- include('partials/footer') %>

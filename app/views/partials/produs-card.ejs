@@ -1,0 +1,31 @@
+<%# Cardul unui produs – folosit în catalog, pe prima pagină și la produse similare %>
+<div class="card product-card">
+  <a href="/produs/<%= p.id_produs %>" class="product-img">
+    <%# Dacă imaginea lipsește, rămâne vizibil placeholder-ul cu inițialele mărcii %>
+    <span class="img-placeholder"><%= (p.marca || '?').slice(0, 2).toUpperCase() %></span>
+    <% if (p.imagine_url) { %><img src="<%= p.imagine_url %>" alt="" onerror="this.remove()"><% } %>
+    <% if (p.stoc <= 0) { %>
+      <span class="stock-tag out">Stoc epuizat</span>
+    <% } else if (p.stoc <= 5) { %>
+      <span class="stock-tag low">Ultimele <%= p.stoc %> buc.</span>
+    <% } %>
+  </a>
+  <div class="product-body">
+    <span class="muted small"><%= p.marca %> · <%= p.categorie %></span>
+    <a href="/produs/<%= p.id_produs %>" class="product-name"><%= p.nume %></a>
+    <div class="product-foot">
+      <div>
+        <div class="price"><%= lei(p.pret) %> <small>lei</small></div>
+        <span class="muted small">TVA inclus</span>
+      </div>
+      <% if (p.stoc > 0) { %>
+        <form action="/cos/adauga" method="post">
+          <input type="hidden" name="id_produs" value="<%= p.id_produs %>">
+          <button class="btn-accent">🛒 Adaugă</button>
+        </form>
+      <% } else { %>
+        <a href="/produs/<%= p.id_produs %>" class="btn-ghost">Vezi</a>
+      <% } %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,54 @@
+<%- include('_header') %>
+
+<div class="page-head">
+  <h1 class="page-title"><%= titlu %></h1>
+  <a href="/admin/produse" class="btn-ghost">← Înapoi la produse</a>
+</div>
+
+<form action="/admin/produse<%= p.id_produs ? '/' + p.id_produs : '' %>" method="post" class="card form-card">
+  <div class="form grid-2">
+    <label>Nume *<input name="nume" value="<%= p.nume || '' %>" required maxlength="150"></label>
+    <label>Cod produs * <small class="muted">(unic)</small><input name="cod_produs" value="<%= p.cod_produs || '' %>" required maxlength="30" placeholder="TG-CPU-0010"></label>
+
+    <label>Categorie *
+      <select name="id_categorie" required>
+        <option value="">— alege —</option>
+        <% categorii.forEach(c => { %>
+          <option value="<%= c.id_categorie %>" <%= p.id_categorie == c.id_categorie ? 'selected' : '' %>>
+            <%= c.parinte ? c.parinte + ' › ' + c.nume : c.nume %>
+          </option>
+        <% }) %>
+      </select>
+    </label>
+    <label>Marcă *
+      <select name="id_marca" required>
+        <option value="">— alege —</option>
+        <% marci.forEach(m => { %><option value="<%= m.id_marca %>" <%= p.id_marca == m.id_marca ? 'selected' : '' %>><%= m.nume %></option><% }) %>
+      </select>
+    </label>
+
+    <label>Preț (lei) *<input type="number" name="pret" step="0.01" min="0" value="<%= p.pret || '' %>" required></label>
+    <label>Garanție (luni)<input type="number" name="garantie_luni" min="0" value="<%= p.garantie_luni ?? 24 %>"></label>
+
+    <% if (!p.id_produs) { %>
+      <label>Stoc inițial<input type="number" name="stoc" min="0" value="<%= p.stoc || 0 %>"></label>
+    <% } else { %>
+      <label>Stoc actual
+        <input value="<%= p.stoc %> buc." disabled>
+        <small class="muted">Stocul se modifică din <a href="/admin/stoc?produs=<%= p.id_produs %>" class="accent">Stocuri</a>, ca să rămână istoricul.</small>
+      </label>
+    <% } %>
+    <label>Imagine (URL)<input name="imagine_url" value="<%= p.imagine_url || '' %>" placeholder="/img/produse/nume.jpg"></label>
+
+    <label class="span-2">Descriere<textarea name="descriere" rows="3"><%= p.descriere || '' %></textarea></label>
+    <label class="span-2">Specificații tehnice <small class="muted">(format JSON – se salvează în coloana JSONB)</small>
+      <textarea name="specificatii" rows="7" class="mono" placeholder='{"socket": "AM5", "nuclee": 8, "frecventa_boost_ghz": 5.0}'><%= p.specificatii || '' %></textarea>
+    </label>
+
+    <label class="check span-2"><input type="checkbox" name="activ" <%= p.activ === true || p.activ === 'on' ? 'checked' : '' %>> Produs activ (vizibil în magazin)</label>
+
+    <button class="btn-accent btn-lg span-2"><%= p.id_produs ? 'Salvează modificările' : 'Adaugă produsul' %></button>
+  </div>
+</form>
+
+<%- include('_footer') %>

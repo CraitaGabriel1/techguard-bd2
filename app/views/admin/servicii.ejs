@@ -1,0 +1,45 @@
+<%- include('_header') %>
+
+<h1 class="page-title">Servicii de service</h1>
+
+<div class="two-cols wide-left">
+  <div class="card">
+    <table class="table">
+      <thead><tr><th>ID</th><th>Nume</th><th class="right">Preț estimativ</th><th class="right">Durată</th><th class="right">Cereri</th><th>Stare</th><th></th></tr></thead>
+      <tbody>
+        <% servicii.forEach(s => { %>
+          <tr class="<%= s.activ ? '' : 'inactive' %>">
+            <td class="muted"><%= s.id_serviciu %></td>
+            <td><b><%= s.nume %></b><br><span class="muted small"><%= s.descriere %></span></td>
+            <td class="right"><%= lei(s.pret_estimativ) %></td>
+            <td class="right"><%= s.durata_estimata_zile %> zile</td>
+            <td class="right"><%= s.nr_cereri %></td>
+            <td><%= s.activ ? '✅' : '⛔' %></td>
+            <td class="actions">
+              <a href="?editeaza=<%= s.id_serviciu %>" class="btn-ghost btn-sm">Editează</a>
+              <form action="/admin/servicii/<%= s.id_serviciu %>/sterge" method="post" onsubmit="return confirm('Ștergi serviciul?')">
+                <button class="btn-danger btn-sm">Șterge</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card form-card">
+    <h3><%= editare ? 'Editează serviciul' : 'Serviciu nou' %></h3>
+    <form action="/admin/servicii" method="post" class="form">
+      <% if (editare) { %><input type="hidden" name="id_serviciu" value="<%= editare.id_serviciu %>"><% } %>
+      <label>Nume *<input name="nume" value="<%= editare ? editare.nume : '' %>" required></label>
+      <label>Descriere<textarea name="descriere" rows="3"><%= editare ? editare.descriere || '' : '' %></textarea></label>
+      <label>Preț estimativ (lei)<input type="number" step="0.01" min="0" name="pret_estimativ" value="<%= editare ? editare.pret_estimativ || '' : '' %>"></label>
+      <label>Durată estimată (zile)<input type="number" min="1" name="durata_estimata_zile" value="<%= editare ? editare.durata_estimata_zile || '' : '' %>"></label>
+      <label class="check"><input type="checkbox" name="activ" <%= !editare || editare.activ ? 'checked' : '' %>> Activ</label>
+      <button class="btn-accent"><%= editare ? 'Salvează' : 'Adaugă' %></button>
+      <% if (editare) { %><a href="/admin/servicii" class="btn-ghost center">Anulează</a><% } %>
+    </form>
+  </div>
+</div>
+
+<%- include('_footer') %>

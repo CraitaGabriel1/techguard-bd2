@@ -1,0 +1,56 @@
+<%- include('_header') %>
+
+<h1 class="page-title">Stocuri</h1>
+
+<div class="two-cols wide-left">
+  <div class="card">
+    <div class="card-head">
+      <h3>Istoricul mișcărilor de stoc</h3>
+      <form method="get" class="inline-form">
+        <select name="produs" onchange="this.form.submit()">
+          <option value="">Toate produsele</option>
+          <% produse.forEach(p => { %><option value="<%= p.id_produs %>" <%= f.produs == p.id_produs ? 'selected' : '' %>><%= p.nume %></option><% }) %>
+        </select>
+      </form>
+    </div>
+    <table class="table">
+      <thead><tr><th>Data</th><th>Produs</th><th>Tip</th><th class="right">Cantitate</th><th>Motiv</th><th>Utilizator</th></tr></thead>
+      <tbody>
+        <% miscari.forEach(m => { %>
+          <tr>
+            <td class="small"><%= dataOra(m.data_miscare) %></td>
+            <td><%= m.produs %></td>
+            <td><span class="status s-<%= m.tip_miscare %>"><%= m.tip_miscare %></span></td>
+            <td class="right"><b class="<%= m.cantitate < 0 ? 'danger-text' : 'success-text' %>"><%= m.cantitate > 0 ? '+' : '' %><%= m.cantitate %></b></td>
+            <td class="small"><%= m.motiv || '' %><% if (m.numar_comanda) { %> <a href="/admin/comenzi/<%= m.id_comanda %>" class="accent">(<%= m.numar_comanda %>)</a><% } %></td>
+            <td class="small"><%= m.utilizator || '—' %></td>
+          </tr>
+        <% }) %>
+        <% if (!miscari.length) { %><tr><td colspan="6" class="muted">Nicio mișcare de stoc.</td></tr><% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card form-card">
+    <h3>Mișcare nouă</h3>
+    <form action="/admin/stoc" method="post" class="form">
+      <label>Produs
+        <select name="id_produs" required>
+          <option value="">— alege —</option>
+          <% produse.forEach(p => { %><option value="<%= p.id_produs %>" <%= f.produs == p.id_produs ? 'selected' : '' %>><%= p.nume %> (stoc: <%= p.stoc %>)</option><% }) %>
+        </select>
+      </label>
+      <label>Tip
+        <select name="tip_miscare">
+          <option value="intrare">Intrare (recepție marfă)</option>
+          <option value="corectie">Corecție (inventar, + sau −)</option>
+        </select>
+      </label>
+      <label>Cantitate <small class="muted">(negativă doar la corecție)</small><input type="number" name="cantitate" required></label>
+      <label>Motiv<input name="motiv" placeholder="ex: Recepție factura 1234"></label>
+      <button class="btn-accent">Înregistrează</button>
+    </form>
+  </div>
+</div>
+
+<%- include('_footer') %>

@@ -1,0 +1,30 @@
+<%- include('_header') %>
+
+<div class="page-head">
+  <h1 class="page-title"><%= titlu %></h1>
+  <a href="/admin/utilizatori" class="btn-ghost">← Înapoi la utilizatori</a>
+</div>
+
+<form action="/admin/utilizatori<%= u.id_utilizator ? '/' + u.id_utilizator : '' %>" method="post" class="card form-card">
+  <div class="form grid-2">
+    <label>Nume *<input name="nume" value="<%= u.nume || '' %>" required></label>
+    <label>Prenume *<input name="prenume" value="<%= u.prenume || '' %>" required></label>
+    <label>Email *<input type="email" name="email" value="<%= u.email || '' %>" required></label>
+    <label>Rol *
+      <select name="id_rol">
+        <% roluri.forEach(r => { %><option value="<%= r.id_rol %>" <%= u.id_rol == r.id_rol ? 'selected' : '' %>><%= r.nume_rol %> – <%= r.descriere %></option><% }) %>
+      </select>
+    </label>
+    <label><%= u.id_utilizator ? 'Parolă nouă (gol = rămâne cea veche)' : 'Parolă *' %>
+      <input type="password" name="parola" minlength="8" <%= u.id_utilizator ? '' : 'required' %>>
+    </label>
+    <label>Telefon<input name="telefon" value="<%= u.telefon || '' %>" maxlength="15"></label>
+    <label>Adresă<input name="adresa" value="<%= u.adresa || '' %>"></label>
+    <label>Oraș<input name="oras" value="<%= u.oras || '' %>"></label>
+    <label>Județ<input name="judet" value="<%= u.judet || '' %>"></label>
+    <label class="check"><input type="checkbox" name="activ" <%= u.activ === true || u.activ === 'on' ? 'checked' : '' %>> Cont activ (debifat = blocat, nu se mai poate autentifica)</label>
+    <button class="btn-accent btn-lg span-2"><%= u.id_utilizator ? 'Salvează modificările' : 'Creează utilizatorul' %></button>
+  </div>
+</form>
+
+<%- include('_footer') %>

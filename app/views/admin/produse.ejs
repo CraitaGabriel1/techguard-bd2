@@ -1,0 +1,58 @@
+<%- include('_header') %>
+
+<div class="page-head">
+  <h1 class="page-title">Produse <span class="muted count"><%= total %></span></h1>
+  <a href="/admin/produse/nou" class="btn-accent">+ Produs nou</a>
+</div>
+
+<form method="get" class="toolbar card">
+  <input name="q" value="<%= f.q || '' %>" placeholder="Caută după nume sau cod...">
+  <select name="categorie">
+    <option value="">Toate categoriile</option>
+    <% categorii.forEach(c => { %><option value="<%= c.id_categorie %>" <%= f.categorie == c.id_categorie ? 'selected' : '' %>><%= c.nume %></option><% }) %>
+  </select>
+  <select name="stare">
+    <option value="">Toate</option>
+    <option value="activ" <%= f.stare === 'activ' ? 'selected' : '' %>>Active</option>
+    <option value="inactiv" <%= f.stare === 'inactiv' ? 'selected' : '' %>>Inactive</option>
+    <option value="stoc_redus" <%= f.stare === 'stoc_redus' ? 'selected' : '' %>>Stoc redus</option>
+  </select>
+  <button class="btn-accent">Filtrează</button>
+</form>
+
+<div class="card">
+  <table class="table">
+    <thead><tr><th>ID</th><th>Cod</th><th>Nume</th><th>Categorie</th><th>Marcă</th><th class="right">Preț</th><th class="right">Stoc</th><th>Stare</th><th></th></tr></thead>
+    <tbody>
+      <% produse.forEach(p => { %>
+        <tr class="<%= p.activ ? '' : 'inactive' %>">
+          <td class="muted"><%= p.id_produs %></td>
+          <td><code><%= p.cod_produs %></code></td>
+          <td><a href="/produs/<%= p.id_produs %>" target="_blank"><%= p.nume %></a></td>
+          <td><%= p.categorie %></td>
+          <td><%= p.marca %></td>
+          <td class="right"><%= lei(p.pret) %></td>
+          <td class="right"><span class="<%= p.stoc <= 5 ? 'danger-text' : '' %>"><%= p.stoc %></span></td>
+          <td><%= p.activ ? '✅ Activ' : '⛔ Inactiv' %></td>
+          <td class="actions">
+            <a href="/admin/produse/<%= p.id_produs %>/editeaza" class="btn-ghost btn-sm">Editează</a>
+            <a href="/admin/stoc?produs=<%= p.id_produs %>" class="btn-ghost btn-sm">Stoc</a>
+            <form action="/admin/produse/<%= p.id_produs %>/sterge" method="post" onsubmit="return confirm('Ștergi produsul „<%= p.nume.replace(/'/g, '') %>”?')">
+              <button class="btn-danger btn-sm">Șterge</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<% if (nrPagini > 1) { %>
+  <div class="pagination">
+    <% for (let i = 1; i <= nrPagini; i++) { %>
+      <a href="?<%= new URLSearchParams({ ...f, pagina: i }).toString() %>" class="<%= i === pagina ? 'active' : '' %>"><%= i %></a>
+    <% } %>
+  </div>
+<% } %>
+
+<%- include('_footer') %>

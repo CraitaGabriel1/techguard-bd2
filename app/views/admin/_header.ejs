@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= titlu %> – Admin TECHGUARD</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin">
+<% const esteAdmin = user.rol === 'Administrator';
+   const activ = (p) => (cale === '/admin' + p || cale.startsWith('/admin' + p + '/')) ? 'active' : ''; %>
+<div class="admin-layout">
+  <aside class="sidebar">
+    <a href="/admin" class="logo"><img src="/img/logo.png" alt="TECHGUARD" class="logo-img"></a>
+    <span class="muted small">Panou de administrare</span>
+
+    <nav>
+      <a href="/admin" class="<%= cale === '/admin' || cale === '/admin/' ? 'active' : '' %>">📊 Panou principal</a>
+      <span class="nav-group">Magazin</span>
+      <a href="/admin/produse" class="<%= activ('/produse') %>">📦 Produse</a>
+      <a href="/admin/stoc" class="<%= activ('/stoc') %>">📈 Stocuri</a>
+      <a href="/admin/marci" class="<%= activ('/marci') %>">🏷️ Mărci</a>
+      <% if (esteAdmin) { %><a href="/admin/categorii" class="<%= activ('/categorii') %>">🗂️ Categorii</a><% } %>
+      <span class="nav-group">Vânzări & service</span>
+      <a href="/admin/comenzi" class="<%= activ('/comenzi') %>">🧾 Comenzi</a>
+      <a href="/admin/service" class="<%= activ('/service') %>">🔧 Cereri service</a>
+      <% if (esteAdmin) { %>
+        <a href="/admin/servicii" class="<%= activ('/servicii') %>">🛠️ Servicii</a>
+        <span class="nav-group">Administrare</span>
+        <a href="/admin/utilizatori" class="<%= activ('/utilizatori') %>">👥 Utilizatori</a>
+      <% } %>
+    </nav>
+
+    <div class="sidebar-user">
+      <b><%= user.prenume %> <%= user.nume %></b>
+      <span class="rol-tag"><%= user.rol %></span>
+      <a href="/" class="small">← Înapoi în magazin</a>
+      <form action="/logout" method="post"><button class="link-btn small">Ieșire din cont</button></form>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <%- include('../partials/flash') %>

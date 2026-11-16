@@ -1,0 +1,50 @@
+<%- include('_header') %>
+
+<h1 class="page-title">Categorii <span class="muted count"><%= categorii.length %></span></h1>
+
+<div class="two-cols wide-left">
+  <div class="card">
+    <table class="table">
+      <thead><tr><th>ID</th><th>Nume</th><th>Slug (URL)</th><th>Părinte</th><th class="right">Produse</th><th></th></tr></thead>
+      <tbody>
+        <% categorii.forEach(c => { %>
+          <tr>
+            <td class="muted"><%= c.id_categorie %></td>
+            <td><%= c.id_parinte ? '↳ ' : '' %><b><%= c.nume %></b></td>
+            <td><code><%= c.slug %></code></td>
+            <td><%= c.parinte || '— principală —' %></td>
+            <td class="right"><%= c.nr_produse %></td>
+            <td class="actions">
+              <a href="?editeaza=<%= c.id_categorie %>" class="btn-ghost btn-sm">Editează</a>
+              <form action="/admin/categorii/<%= c.id_categorie %>/sterge" method="post" onsubmit="return confirm('Ștergi categoria?')">
+                <button class="btn-danger btn-sm">Șterge</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card form-card">
+    <h3><%= editare ? 'Editează categoria' : 'Categorie nouă' %></h3>
+    <form action="/admin/categorii" method="post" class="form">
+      <% if (editare) { %><input type="hidden" name="id_categorie" value="<%= editare.id_categorie %>"><% } %>
+      <label>Nume *<input name="nume" value="<%= editare ? editare.nume : '' %>" required></label>
+      <label>Slug <small class="muted">(gol = generat automat din nume)</small><input name="slug" value="<%= editare ? editare.slug : '' %>"></label>
+      <label>Categorie părinte
+        <select name="id_parinte">
+          <option value="">— categorie principală —</option>
+          <% principale.forEach(p => { if (editare && p.id_categorie === editare.id_categorie) return; %>
+            <option value="<%= p.id_categorie %>" <%= editare && editare.id_parinte === p.id_categorie ? 'selected' : '' %>><%= p.nume %></option>
+          <% }) %>
+        </select>
+      </label>
+      <label>Descriere<textarea name="descriere" rows="3"><%= editare ? editare.descriere || '' : '' %></textarea></label>
+      <button class="btn-accent"><%= editare ? 'Salvează' : 'Adaugă' %></button>
+      <% if (editare) { %><a href="/admin/categorii" class="btn-ghost center">Anulează</a><% } %>
+    </form>
+  </div>
+</div>
+
+<%- include('_footer') %>

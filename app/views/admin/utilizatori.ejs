@@ -1,0 +1,45 @@
+<%- include('_header') %>
+
+<div class="page-head">
+  <h1 class="page-title">Utilizatori <span class="muted count"><%= utilizatori.length %></span></h1>
+  <a href="/admin/utilizatori/nou" class="btn-accent">+ Utilizator nou</a>
+</div>
+
+<form method="get" class="toolbar card">
+  <input name="q" value="<%= f.q || '' %>" placeholder="Nume sau email...">
+  <select name="rol">
+    <option value="">Toate rolurile</option>
+    <% ['Client', 'Angajat', 'Administrator'].forEach(r => { %><option <%= f.rol === r ? 'selected' : '' %>><%= r %></option><% }) %>
+  </select>
+  <button class="btn-accent">Filtrează</button>
+</form>
+
+<div class="card">
+  <table class="table">
+    <thead><tr><th>ID</th><th>Nume</th><th>Email</th><th>Rol</th><th>Oraș</th><th class="right">Comenzi</th><th>Înregistrat</th><th>Stare</th><th></th></tr></thead>
+    <tbody>
+      <% utilizatori.forEach(u => { %>
+        <tr class="<%= u.activ ? '' : 'inactive' %>">
+          <td class="muted"><%= u.id_utilizator %></td>
+          <td><b><%= u.prenume %> <%= u.nume %></b></td>
+          <td><%= u.email %></td>
+          <td><span class="rol-tag r-<%= u.nume_rol %>"><%= u.nume_rol %></span></td>
+          <td><%= u.oras || '—' %></td>
+          <td class="right"><%= u.nr_comenzi %></td>
+          <td class="small"><%= data(u.data_inregistrare) %></td>
+          <td><%= u.activ ? '✅ Activ' : '⛔ Blocat' %></td>
+          <td class="actions">
+            <a href="/admin/utilizatori/<%= u.id_utilizator %>/editeaza" class="btn-ghost btn-sm">Editează</a>
+            <% if (u.id_utilizator !== user.id) { %>
+              <form action="/admin/utilizatori/<%= u.id_utilizator %>/sterge" method="post" onsubmit="return confirm('Ștergi utilizatorul?')">
+                <button class="btn-danger btn-sm">Șterge</button>
+              </form>
+            <% } %>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('_footer') %>

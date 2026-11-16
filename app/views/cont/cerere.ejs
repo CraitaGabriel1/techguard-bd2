@@ -1,0 +1,34 @@
+<%- include('../partials/header') %>
+
+<h1 class="page-title">Cererea <%= cerere.numar_cerere %> <span class="status s-<%= cerere.status %>"><%= STATUS_SERVICE[cerere.status] %></span></h1>
+<%- include('_meniu') %>
+
+<div class="cart-layout">
+  <div class="card form-card">
+    <h3>Istoricul reparației</h3>
+    <%# Cronologia din tabela istoric_service %>
+    <ul class="timeline">
+      <% istoric.forEach(i => { %>
+        <li>
+          <span class="status s-<%= i.status_nou %>"><%= STATUS_SERVICE[i.status_nou] %></span>
+          <span class="muted small"><%= dataOra(i.data_modificare) %> · <%= i.autor %></span>
+          <% if (i.comentariu) { %><p><%= i.comentariu %></p><% } %>
+        </li>
+      <% }) %>
+    </ul>
+  </div>
+
+  <aside class="card summary">
+    <h3>Detalii</h3>
+    <p><span class="muted">Serviciu:</span> <%= cerere.serviciu %></p>
+    <p><span class="muted">Dispozitiv:</span> <%= cerere.tip_dispozitiv %> – <%= cerere.marca_dispozitiv %> <%= cerere.model_dispozitiv || '' %></p>
+    <% if (cerere.serie_dispozitiv) { %><p><span class="muted">Serie:</span> <%= cerere.serie_dispozitiv %></p><% } %>
+    <p><span class="muted">Problema:</span> <%= cerere.descriere_problema %></p>
+    <p><span class="muted">Tehnician:</span> <%= cerere.angajat || 'nealocat încă' %></p>
+    <p><span class="muted">Cost estimat:</span> <%= cerere.cost_estimat ? lei(cerere.cost_estimat) + ' lei' : '—' %></p>
+    <p><span class="muted">Cost final:</span> <%= cerere.cost_final ? lei(cerere.cost_final) + ' lei' : '—' %></p>
+    <a href="/cont/service" class="btn-ghost btn-block center">← Toate cererile</a>
+  </aside>
+</div>
+
+<%- include('../partials/footer') %>

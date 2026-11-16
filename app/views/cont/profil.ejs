@@ -1,0 +1,39 @@
+<%- include('../partials/header') %>
+
+<h1 class="page-title">Salut, <%= u.prenume %>! <span class="rol-tag big"><%= u.nume_rol %></span></h1>
+<%- include('_meniu') %>
+
+<div class="stats">
+  <div class="card stat"><span class="muted">Comenzi plasate</span><b><%= stat.nr_comenzi %></b></div>
+  <div class="card stat"><span class="muted">Total cumpărături</span><b><%= lei(stat.total_cheltuit) %> lei</b></div>
+  <div class="card stat"><span class="muted">Cereri de service</span><b><%= stat.nr_service %></b></div>
+  <div class="card stat"><span class="muted">Client din</span><b><%= data(u.data_inregistrare) %></b></div>
+</div>
+
+<div class="two-cols">
+  <div class="card form-card">
+    <h3>Datele mele</h3>
+    <form action="/cont" method="post" class="form grid-2">
+      <label>Nume<input name="nume" value="<%= u.nume %>" required></label>
+      <label>Prenume<input name="prenume" value="<%= u.prenume %>" required></label>
+      <label class="span-2">Email <small class="muted">(nu se poate schimba)</small><input value="<%= u.email %>" disabled></label>
+      <label>Telefon<input name="telefon" value="<%= u.telefon || '' %>" maxlength="15"></label>
+      <label>Oraș<input name="oras" value="<%= u.oras || '' %>"></label>
+      <label>Județ<input name="judet" value="<%= u.judet || '' %>"></label>
+      <label>Adresă<input name="adresa" value="<%= u.adresa || '' %>"></label>
+      <button class="btn-accent span-2">Salvează modificările</button>
+    </form>
+  </div>
+
+  <div class="card form-card">
+    <h3>Schimbă parola</h3>
+    <form action="/cont/parola" method="post" class="form">
+      <label>Parola actuală<input type="password" name="parola_veche" required></label>
+      <label>Parola nouă <small class="muted">(min. 8 caractere)</small><input type="password" name="parola_noua" minlength="8" required></label>
+      <label>Confirmă parola nouă<input type="password" name="parola_noua2" minlength="8" required></label>
+      <button class="btn-accent">Schimbă parola</button>
+    </form>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

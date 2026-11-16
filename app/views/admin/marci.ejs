@@ -1,0 +1,42 @@
+<%- include('_header') %>
+
+<h1 class="page-title">Mărci <span class="muted count"><%= marci.length %></span></h1>
+
+<div class="two-cols wide-left">
+  <div class="card">
+    <table class="table">
+      <thead><tr><th>ID</th><th>Nume</th><th>Țara</th><th>Website</th><th class="right">Produse</th><th></th></tr></thead>
+      <tbody>
+        <% marci.forEach(m => { %>
+          <tr>
+            <td class="muted"><%= m.id_marca %></td>
+            <td><b><%= m.nume %></b></td>
+            <td><%= m.tara_origine || '—' %></td>
+            <td class="small"><%= m.website || '—' %></td>
+            <td class="right"><%= m.nr_produse %></td>
+            <td class="actions">
+              <a href="?editeaza=<%= m.id_marca %>" class="btn-ghost btn-sm">Editează</a>
+              <form action="/admin/marci/<%= m.id_marca %>/sterge" method="post" onsubmit="return confirm('Ștergi marca?')">
+                <button class="btn-danger btn-sm">Șterge</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card form-card">
+    <h3><%= editare ? 'Editează marca' : 'Marcă nouă' %></h3>
+    <form action="/admin/marci" method="post" class="form">
+      <% if (editare) { %><input type="hidden" name="id_marca" value="<%= editare.id_marca %>"><% } %>
+      <label>Nume *<input name="nume" value="<%= editare ? editare.nume : '' %>" required></label>
+      <label>Țara de origine<input name="tara_origine" value="<%= editare ? editare.tara_origine || '' : '' %>"></label>
+      <label>Website<input name="website" value="<%= editare ? editare.website || '' : '' %>"></label>
+      <button class="btn-accent"><%= editare ? 'Salvează' : 'Adaugă' %></button>
+      <% if (editare) { %><a href="/admin/marci" class="btn-ghost center">Anulează</a><% } %>
+    </form>
+  </div>
+</div>
+
+<%- include('_footer') %>

@@ -1,0 +1,10 @@
+<nav class="tabs">
+  <a href="/cont" class="<%= cale === '/cont' ? 'active' : '' %>">👤 Datele mele</a>
+  <% if (user.rol === 'Client') { %>
+    <a href="/cont/comenzi" class="<%= cale.startsWith('/cont/comenzi') ? 'active' : '' %>">📦 Comenzile mele</a>
+    <a href="/cont/service" class="<%= cale.startsWith('/cont/service') ? 'active' : '' %>">🔧 Cereri de service</a>
+    <a href="/cos">🛒 Coșul meu</a>
+  <% } else { %>
+    <a href="/admin">🛠️ Panou de administrare</a>
+  <% } %>
+</nav>

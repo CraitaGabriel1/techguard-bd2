@@ -1,0 +1,51 @@
+<%- include('../partials/header') %>
+
+<h1 class="page-title">Comanda <%= comanda.numar_comanda %> <span class="status s-<%= comanda.status %>"><%= STATUS_COMANDA[comanda.status] %></span></h1>
+<%- include('_meniu') %>
+
+<%# Bara de progres a comenzii %>
+<% if (comanda.status !== 'anulata') { const etape = ['plasata', 'procesata', 'expediata', 'livrata'];
+     const idx = etape.indexOf(comanda.status); %>
+  <div class="progress card">
+    <% etape.forEach((e, i) => { %>
+      <div class="step <%= i <= idx ? 'done' : '' %>"><span><%= i + 1 %></span><%= STATUS_COMANDA[e] %></div>
+    <% }) %>
+  </div>
+<% } %>
+
+<div class="cart-layout">
+  <div class="card">
+    <table class="table">
+      <thead><tr><th>Produs</th><th class="right">Preț</th><th class="right">Cant.</th><th class="right">Subtotal</th></tr></thead>
+      <tbody>
+        <% produse.forEach(p => { %>
+          <tr>
+            <td><a href="/produs/<%= p.id_produs %>"><%= p.nume %></a></td>
+            <td class="right"><%= lei(p.pret_unitar) %></td>
+            <td class="right"><%= p.cantitate %></td>
+            <td class="right"><b><%= lei(p.subtotal) %></b></td>
+          </tr>
+        <% }) %>
+        <tr><td colspan="3" class="right">Transport</td><td class="right"><%= lei(comanda.cost_transport) %></td></tr>
+        <tr class="total"><td colspan="3" class="right">Total</td><td class="right"><%= lei(comanda.total) %> lei</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <aside class="card summary">
+    <h3>Detalii</h3>
+    <p><span class="muted">Data:</span> <%= dataOra(comanda.data_comanda) %></p>
+    <p><span class="muted">Plată:</span> <%= PLATA[comanda.metoda_plata] %></p>
+    <p><span class="muted">Livrare:</span> <%= comanda.adresa_livrare %>, <%= comanda.oras_livrare %>, jud. <%= comanda.judet_livrare %></p>
+    <p><span class="muted">Telefon:</span> <%= comanda.telefon_contact %></p>
+    <% if (comanda.observatii) { %><p><span class="muted">Observații:</span> <%= comanda.observatii %></p><% } %>
+    <% if (comanda.status === 'plasata') { %>
+      <form action="/cont/comenzi/<%= comanda.id_comanda %>/anuleaza" method="post" onsubmit="return confirm('Sigur vrei să anulezi comanda?')">
+        <button class="btn-danger btn-block">Anulează comanda</button>
+      </form>
+    <% } %>
+    <a href="/cont/comenzi" class="btn-ghost btn-block center">← Toate comenzile</a>
+  </aside>
+</div>
+
+<%- include('../partials/footer') %>

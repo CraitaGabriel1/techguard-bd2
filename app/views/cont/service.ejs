@@ -1,0 +1,34 @@
+<%- include('../partials/header') %>
+
+<h1 class="page-title">Cererile mele de service</h1>
+<%- include('_meniu') %>
+
+<div class="row-between" style="margin-bottom:16px">
+  <span class="muted"><%= cereri.length %> cereri</span>
+  <a href="/service#cerere" class="btn-accent">+ Cerere nouă</a>
+</div>
+
+<% if (!cereri.length) { %>
+  <div class="card empty"><h3>Nu ai nicio cerere de service</h3></div>
+<% } else { %>
+  <div class="card">
+    <table class="table">
+      <thead><tr><th>Număr</th><th>Data</th><th>Dispozitiv</th><th>Serviciu</th><th>Status</th><th class="right">Cost</th><th></th></tr></thead>
+      <tbody>
+        <% cereri.forEach(c => { %>
+          <tr>
+            <td><b><%= c.numar_cerere %></b></td>
+            <td><%= data(c.data_cerere) %></td>
+            <td><%= c.marca_dispozitiv %> <%= c.model_dispozitiv || '' %></td>
+            <td><%= c.serviciu %></td>
+            <td><span class="status s-<%= c.status %>"><%= STATUS_SERVICE[c.status] %></span></td>
+            <td class="right"><%= c.cost_final ? lei(c.cost_final) + ' lei' : (c.cost_estimat ? '~' + lei(c.cost_estimat) + ' lei' : '—') %></td>
+            <td class="right"><a href="/cont/service/<%= c.id_cerere %>" class="btn-ghost btn-sm">Detalii</a></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>
+
+<%- include('../partials/footer') %>

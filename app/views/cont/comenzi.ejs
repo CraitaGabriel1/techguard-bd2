@@ -1,0 +1,32 @@
+<%- include('../partials/header') %>
+
+<h1 class="page-title">Comenzile mele</h1>
+<%- include('_meniu') %>
+
+<% if (!comenzi.length) { %>
+  <div class="card empty">
+    <h3>Nu ai plasat încă nicio comandă</h3>
+    <a href="/produse" class="btn-accent">Începe cumpărăturile</a>
+  </div>
+<% } else { %>
+  <div class="card">
+    <table class="table">
+      <thead><tr><th>Număr</th><th>Data</th><th>Produse</th><th>Plată</th><th>Status</th><th class="right">Total</th><th></th></tr></thead>
+      <tbody>
+        <% comenzi.forEach(c => { %>
+          <tr>
+            <td><b><%= c.numar_comanda %></b></td>
+            <td><%= dataOra(c.data_comanda) %></td>
+            <td><%= c.nr_produse %> buc.</td>
+            <td><%= PLATA[c.metoda_plata] %></td>
+            <td><span class="status s-<%= c.status %>"><%= STATUS_COMANDA[c.status] %></span></td>
+            <td class="right"><b><%= lei(c.total) %> lei</b></td>
+            <td class="right"><a href="/cont/comenzi/<%= c.id_comanda %>" class="btn-ghost btn-sm">Detalii</a></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>
+
+<%- include('../partials/footer') %>

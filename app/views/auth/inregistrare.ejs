@@ -1,0 +1,25 @@
+<%- include('../partials/header') %>
+
+<section class="auth-wrap">
+  <div class="card auth-card wide">
+    <h1>Creează un cont</h1>
+    <p class="muted">Contul nou primește rolul <b>Client</b>.</p>
+
+    <form action="/inregistrare" method="post" class="form grid-2">
+      <label>Nume *<input name="nume" value="<%= date.nume || '' %>" required></label>
+      <label>Prenume *<input name="prenume" value="<%= date.prenume || '' %>" required></label>
+      <label class="span-2">Email *<input type="email" name="email" value="<%= date.email || '' %>" required></label>
+      <label>Parolă * <small class="muted">(min. 8 caractere)</small><input type="password" name="parola" minlength="8" required></label>
+      <label>Confirmă parola *<input type="password" name="parola2" minlength="8" required></label>
+      <label>Telefon<input name="telefon" value="<%= date.telefon || '' %>" maxlength="15"></label>
+      <label>Oraș<input name="oras" value="<%= date.oras || '' %>"></label>
+      <label>Județ<input name="judet" value="<%= date.judet || '' %>"></label>
+      <label>Adresă<input name="adresa" value="<%= date.adresa || '' %>"></label>
+      <button class="btn-accent btn-lg span-2">Creează contul</button>
+    </form>
+
+    <p class="center muted">Ai deja cont? <a href="/login" class="accent">Intră în cont</a></p>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

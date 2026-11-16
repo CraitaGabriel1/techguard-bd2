@@ -8,6 +8,8 @@ echo.
 echo Urc modificarile pe GitHub...
 git add .
 git commit -m "%MSG%"
+REM aduce mai intai eventualele modificari de pe GitHub, apoi urca
+git pull --rebase
 git push
 echo.
 echo ===== GATA =====

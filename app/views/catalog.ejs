@@ -1,0 +1,102 @@
+<%- include('partials/header') %>
+<%
+  // Construiește link-ul pentru o altă pagină / sortare, păstrând filtrele curente
+  const link = (modificari) => {
+    const p = new URLSearchParams();
+    const tot = { ...filtre, ...modificari };
+    for (const [k, v] of Object.entries(tot)) {
+      if (k === 'marci' || v === '' || v == null) continue;
+      [].concat(v).forEach(x => p.append(k, x));
+    }
+    return '?' + p.toString();
+  };
+%>
+
+<!-- Breadcrumb -->
+<nav class="breadcrumb">
+  <a href="/">Acasă</a> ›
+  <% if (parinte) { %><a href="/categorie/<%= parinte.slug %>"><%= parinte.nume %></a> ›<% } %>
+  <span><%= titlu %></span>
+</nav>
+
+<div class="catalog-head">
+  <h1><%= titlu %> <span class="muted count"><%= nrTotal %> produse</span></h1>
+  <form method="get" class="sort-form">
+    <% for (const [k, v] of Object.entries(filtre)) { if (k === 'sort' || k === 'marci' || k === 'pagina') continue; [].concat(v).forEach(x => { %>
+      <input type="hidden" name="<%= k %>" value="<%= x %>">
+    <% }) } %>
+    <select name="sort" onchange="this.form.submit()">
+      <option value="noi" <%= filtre.sort === 'noi' ? 'selected' : '' %>>Cele mai noi</option>
+      <option value="pret_asc" <%= filtre.sort === 'pret_asc' ? 'selected' : '' %>>Preț crescător</option>
+      <option value="pret_desc" <%= filtre.sort === 'pret_desc' ? 'selected' : '' %>>Preț descrescător</option>
+      <option value="nume" <%= filtre.sort === 'nume' ? 'selected' : '' %>>Nume (A–Z)</option>
+    </select>
+  </form>
+</div>
+
+<% if (subcategorii.length) { %>
+  <div class="subcats">
+    <% subcategorii.forEach(s => { %><a href="/categorie/<%= s.slug %>" class="pill"><%= s.nume %></a><% }) %>
+  </div>
+<% } %>
+
+<div class="catalog">
+  <!-- Filtre -->
+  <aside class="card filters">
+    <form method="get">
+      <% if (filtre.q) { %><input type="hidden" name="q" value="<%= filtre.q %>"><% } %>
+      <% if (filtre.sort) { %><input type="hidden" name="sort" value="<%= filtre.sort %>"><% } %>
+
+      <h3>Filtre</h3>
+
+      <label class="check">
+        <input type="checkbox" name="in_stoc" value="1" <%= filtre.in_stoc ? 'checked' : '' %>>
+        Doar produse în stoc
+      </label>
+
+      <h4>Preț (lei)</h4>
+      <div class="price-range">
+        <input type="number" name="pret_min" placeholder="<%= interval.min || 0 %>" value="<%= filtre.pret_min || '' %>" min="0">
+        <span>–</span>
+        <input type="number" name="pret_max" placeholder="<%= interval.max || 0 %>" value="<%= filtre.pret_max || '' %>" min="0">
+      </div>
+
+      <% if (marci.length) { %>
+        <h4>Marcă</h4>
+        <% marci.forEach(m => { %>
+          <label class="check">
+            <input type="checkbox" name="marca" value="<%= m.id_marca %>" <%= filtre.marci.includes(m.id_marca) ? 'checked' : '' %>>
+            <%= m.nume %> <span class="muted">(<%= m.nr %>)</span>
+          </label>
+        <% }) %>
+      <% } %>
+
+      <button class="btn-accent btn-block">Aplică filtrele</button>
+      <a href="?<%= filtre.q ? 'q=' + encodeURIComponent(filtre.q) : '' %>" class="btn-ghost btn-block center">Resetează</a>
+    </form>
+  </aside>
+
+  <!-- Produse -->
+  <section>
+    <% if (!produse.length) { %>
+      <div class="card empty">
+        <h3>Niciun produs găsit</h3>
+        <p class="muted">Încearcă alte filtre sau alt termen de căutare.</p>
+      </div>
+    <% } else { %>
+      <div class="grid-products">
+        <% produse.forEach(p => { %><%- include('partials/produs-card', { p }) %><% }) %>
+      </div>
+
+      <% if (nrPagini > 1) { %>
+        <div class="pagination">
+          <% for (let i = 1; i <= nrPagini; i++) { %>
+            <a href="<%= link({ pagina: i }) %>" class="<%= i === pagina ? 'active' : '' %>"><%= i %></a>
+          <% } %>
+        </div>
+      <% } %>
+    <% } %>
+  </section>
+</div>
+
+<%- include('partials/footer') %>

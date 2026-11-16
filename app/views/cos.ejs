@@ -1,0 +1,52 @@
+<%- include('partials/header') %>
+
+<h1 class="page-title">Coșul meu</h1>
+
+<% if (!produse.length) { %>
+  <div class="card empty">
+    <h3>Coșul tău este gol</h3>
+    <p class="muted">Adaugă produse din catalog ca să plasezi o comandă.</p>
+    <a href="/produse" class="btn-accent">Vezi produsele</a>
+  </div>
+<% } else { %>
+  <div class="cart-layout">
+    <div class="card">
+      <% produse.forEach(p => { %>
+        <div class="cart-row">
+          <a href="/produs/<%= p.id_produs %>" class="cart-img">
+            <span class="img-placeholder"><%= p.marca.slice(0, 2).toUpperCase() %></span>
+            <% if (p.imagine_url) { %><img src="<%= p.imagine_url %>" alt="" onerror="this.remove()"><% } %>
+          </a>
+          <div class="cart-info">
+            <a href="/produs/<%= p.id_produs %>" class="product-name"><%= p.nume %></a>
+            <span class="muted small"><%= lei(p.pret) %> lei / buc. · stoc: <%= p.stoc %></span>
+          </div>
+          <form action="/cos/actualizeaza" method="post" class="qty-form">
+            <input type="hidden" name="id_produs" value="<%= p.id_produs %>">
+            <input type="number" name="cantitate" value="<%= p.cantitate %>" min="0" max="<%= p.stoc %>" onchange="this.form.submit()">
+          </form>
+          <div class="price"><%= lei(p.subtotal) %> <small>lei</small></div>
+          <form action="/cos/sterge" method="post">
+            <input type="hidden" name="id_produs" value="<%= p.id_produs %>">
+            <button class="btn-icon" title="Șterge din coș">✕</button>
+          </form>
+        </div>
+      <% }) %>
+    </div>
+
+    <aside class="card summary">
+      <h3>Sumar comandă</h3>
+      <div class="row-between"><span>Produse</span><span><%= lei(subtotal) %> lei</span></div>
+      <div class="row-between"><span>Transport</span><span><%= transport ? lei(transport) + ' lei' : 'Gratuit' %></span></div>
+      <% if (transport) { %>
+        <p class="muted small">Mai adaugă produse de <%= lei(prag - subtotal) %> lei pentru transport gratuit.</p>
+      <% } %>
+      <hr>
+      <div class="row-between total"><span>Total</span><span><%= lei(subtotal + transport) %> lei</span></div>
+      <a href="/checkout" class="btn-accent btn-lg btn-block center">Finalizează comanda →</a>
+      <a href="/produse" class="btn-ghost btn-block center">Continuă cumpărăturile</a>
+    </aside>
+  </div>
+<% } %>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,85 @@
+<%
+  const categoriiMeniu = locals.meniuCategorii || [];
+  const u = locals.user;
+%><!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= titlu %> – TECHGUARD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<!-- Bara de sus cu avantaje -->
+<div class="topbar">
+  <span>🚚 <b>Livrare gratuită</b> la comenzi peste 500 lei</span>
+  <span>🛡️ <b>Garanție</b> la fiecare produs</span>
+  <span>↩️ <b>14 zile</b> drept de retur</span>
+  <span>🔧 <b>Service TECHGUARD</b> pentru PC, laptop și console</span>
+</div>
+
+<header class="header">
+  <div class="container header-main">
+    <a href="/" class="logo">
+      <img src="/img/logo.png" alt="TECHGUARD" class="logo-img">
+    </a>
+
+    <form class="search" action="/produse" method="get">
+      <input type="text" name="q" value="<%= locals.filtre && filtre.q ? filtre.q : '' %>" placeholder="Caută procesoare, plăci video, console...">
+      <button type="submit">Caută</button>
+    </form>
+
+    <div class="header-actions">
+      <% if (!u) { %>
+        <a href="/login" class="icon-btn">👤 <span>Intră în cont</span></a>
+      <% } else { %>
+        <div class="dropdown">
+          <button class="icon-btn">👤 <span><%= u.prenume %> <small class="rol-tag"><%= u.rol %></small></span></button>
+          <div class="dropdown-panel">
+            <% if (u.rol !== 'Client') { %>
+              <a href="/admin">🛠️ Panou de administrare</a>
+            <% } %>
+            <a href="/cont">👤 Contul meu</a>
+            <% if (u.rol === 'Client') { %>
+              <a href="/cont/comenzi">📦 Comenzile mele</a>
+              <a href="/cont/service">🔧 Cererile de service</a>
+            <% } %>
+            <form action="/logout" method="post"><button type="submit">🚪 Ieșire din cont</button></form>
+          </div>
+        </div>
+      <% } %>
+      <% if (!u || u.rol === 'Client') { %>
+        <a href="/cos" class="btn-cart">🛒 Coș<% if (locals.nrCos) { %> <span class="cart-count"><%= nrCos %></span><% } %></a>
+      <% } else { %>
+        <a href="/admin" class="btn-cart">🛠️ Admin</a>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Meniul de categorii, generat din tabela "categorii" -->
+  <nav class="container nav">
+    <div class="mega">
+      <button class="btn-accent">☰ Toate categoriile</button>
+      <div class="mega-panel">
+        <% categoriiMeniu.forEach(cat => { %>
+          <div class="mega-col">
+            <a href="/categorie/<%= cat.slug %>" class="mega-title"><%= cat.nume %></a>
+            <% cat.subcategorii.forEach(sub => { %>
+              <a href="/categorie/<%= sub.slug %>"><%= sub.nume %></a>
+            <% }) %>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+    <% categoriiMeniu.forEach(cat => { %>
+      <a href="/categorie/<%= cat.slug %>" class="pill"><%= cat.nume %></a>
+    <% }) %>
+    <a href="/service" class="pill pill-service">🔧 Service</a>
+  </nav>
+</header>
+
+<main class="container">
+<%- include('flash') %>

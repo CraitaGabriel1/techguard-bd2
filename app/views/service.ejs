@@ -1,0 +1,64 @@
+<%- include('partials/header') %>
+
+<section class="hero small-hero">
+  <span class="tag">🔧 Service TECHGUARD</span>
+  <h1>Reparații și mentenanță pentru <span class="accent">PC, laptop și console</span></h1>
+  <p>Trimite cererea online, iar noi te ținem la curent cu fiecare etapă: înregistrată → în lucru → finalizată → predată.</p>
+</section>
+
+<section class="section">
+  <h2>Serviciile noastre</h2>
+  <div class="grid-cat">
+    <% servicii.forEach(s => { %>
+      <div class="card cat-card">
+        <h3><%= s.nume %></h3>
+        <p><%= s.descriere %></p>
+        <div class="cat-foot">
+          <span class="muted">de la</span>
+          <span class="price"><%= lei(s.pret_estimativ) %> <small>lei</small></span>
+          <span class="badge">~<%= s.durata_estimata_zile %> zile</span>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</section>
+
+<section class="section" id="cerere">
+  <div class="card form-card">
+    <h2>Trimite o cerere de service</h2>
+    <% if (!user) { %>
+      <p class="muted">Pentru a trimite o cerere și a urmări reparația, ai nevoie de un cont.</p>
+      <div class="hero-btns">
+        <a href="/login" class="btn-accent">Intră în cont</a>
+        <a href="/inregistrare" class="btn-ghost">Creează cont</a>
+      </div>
+    <% } else if (user.rol !== 'Client') { %>
+      <p class="muted">Ești autentificat ca <b><%= user.rol %></b>. Cererile se gestionează din <a href="/admin/service" class="accent">panoul de administrare</a>.</p>
+    <% } else { %>
+      <form action="/service/cerere" method="post" class="form grid-2">
+        <label>Serviciu *
+          <select name="id_serviciu" required>
+            <% servicii.forEach(s => { %><option value="<%= s.id_serviciu %>"><%= s.nume %> (de la <%= lei(s.pret_estimativ) %> lei)</option><% }) %>
+          </select>
+        </label>
+        <label>Tip dispozitiv *
+          <select name="tip_dispozitiv" required>
+            <option value="calculator">Calculator</option>
+            <option value="laptop">Laptop</option>
+            <option value="consola">Consolă</option>
+            <option value="periferic">Periferic</option>
+          </select>
+        </label>
+        <label>Marcă *<input name="marca_dispozitiv" placeholder="ex: ASUS, Sony" required></label>
+        <label>Model<input name="model_dispozitiv" placeholder="ex: TUF Gaming F15"></label>
+        <label class="span-2">Serie (opțional)<input name="serie_dispozitiv"></label>
+        <label class="span-2">Descrierea problemei *
+          <textarea name="descriere_problema" rows="4" placeholder="Ce nu funcționează? De când?" required></textarea>
+        </label>
+        <button class="btn-accent btn-lg span-2">Trimite cererea</button>
+      </form>
+    <% } %>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

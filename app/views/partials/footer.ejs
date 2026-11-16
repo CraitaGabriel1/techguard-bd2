@@ -1,0 +1,29 @@
+</main>
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <div>
+      <img src="/img/logo.png" alt="TECHGUARD" class="logo-img">
+      <p>Magazin online IT &amp; Gaming și service pentru PC, laptopuri și console.</p>
+    </div>
+    <div>
+      <h4>Magazin</h4>
+      <% (locals.meniuCategorii || []).forEach(cat => { %>
+        <a href="/categorie/<%= cat.slug %>"><%= cat.nume %></a>
+      <% }) %>
+    </div>
+    <div>
+      <h4>Contul meu</h4>
+      <a href="/cont">Datele mele</a>
+      <a href="/cont/comenzi">Comenzile mele</a>
+      <a href="/service">Service</a>
+      <h4 style="margin-top:16px">Contact</h4>
+      <p>Galați, Str. Domnească 47</p>
+      <p>Instagram / TikTok: @techguard_tg</p>
+    </div>
+  </div>
+  <p class="copy">© 2026 TECHGUARD · Proiect Baze de Date Avansate · Crăița Gabriel Ștefan</p>
+</footer>
+
+</body>
+</html>

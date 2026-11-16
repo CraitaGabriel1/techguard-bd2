@@ -1,0 +1,32 @@
+<%- include('_header') %>
+
+<h1 class="page-title">Cereri de service <span class="muted count"><%= cereri.length %></span></h1>
+
+<form method="get" class="toolbar card">
+  <select name="status" onchange="this.form.submit()">
+    <option value="">Toate statusurile</option>
+    <% for (const [k, v] of Object.entries(STATUS_SERVICE)) { %><option value="<%= k %>" <%= f.status === k ? 'selected' : '' %>><%= v %></option><% } %>
+  </select>
+</form>
+
+<div class="card">
+  <table class="table">
+    <thead><tr><th>Număr</th><th>Data</th><th>Client</th><th>Dispozitiv</th><th>Serviciu</th><th>Tehnician</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      <% cereri.forEach(c => { %>
+        <tr>
+          <td><b><%= c.numar_cerere %></b></td>
+          <td class="small"><%= data(c.data_cerere) %></td>
+          <td><%= c.client %></td>
+          <td><%= c.tip_dispozitiv %> – <%= c.marca_dispozitiv %> <%= c.model_dispozitiv || '' %></td>
+          <td class="small"><%= c.serviciu %></td>
+          <td class="small"><%= c.angajat || '— nealocat —' %></td>
+          <td><span class="status s-<%= c.status %>"><%= STATUS_SERVICE[c.status] %></span></td>
+          <td class="right"><a href="/admin/service/<%= c.id_cerere %>" class="btn-ghost btn-sm">Gestionează</a></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('_footer') %>

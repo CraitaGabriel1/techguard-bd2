@@ -1,0 +1,57 @@
+<%- include('_header') %>
+
+<div class="page-head">
+  <h1 class="page-title">Cererea <%= cerere.numar_cerere %> <span class="status s-<%= cerere.status %>"><%= STATUS_SERVICE[cerere.status] %></span></h1>
+  <a href="/admin/service" class="btn-ghost">← Toate cererile</a>
+</div>
+
+<div class="two-cols">
+  <div>
+    <div class="card form-card">
+      <h3>Dispozitiv și problemă</h3>
+      <p><span class="muted">Client:</span> <b><%= cerere.client %></b> · <%= cerere.email %> · <%= cerere.telefon || '' %></p>
+      <p><span class="muted">Dispozitiv:</span> <%= cerere.tip_dispozitiv %> – <%= cerere.marca_dispozitiv %> <%= cerere.model_dispozitiv || '' %>
+        <% if (cerere.serie_dispozitiv) { %>(serie <%= cerere.serie_dispozitiv %>)<% } %></p>
+      <p><span class="muted">Serviciu:</span> <%= cerere.serviciu %> (de la <%= lei(cerere.pret_estimativ) %> lei)</p>
+      <p><span class="muted">Problema:</span> <%= cerere.descriere_problema %></p>
+      <p><span class="muted">Primită:</span> <%= dataOra(cerere.data_cerere) %> · <span class="muted">Finalizată:</span> <%= dataOra(cerere.data_finalizare) %></p>
+    </div>
+
+    <div class="card form-card">
+      <h3>Istoric (tabela istoric_service)</h3>
+      <ul class="timeline">
+        <% istoric.forEach(i => { %>
+          <li>
+            <span class="status s-<%= i.status_nou %>"><%= STATUS_SERVICE[i.status_nou] %></span>
+            <span class="muted small"><%= dataOra(i.data_modificare) %> · <%= i.autor %></span>
+            <% if (i.comentariu) { %><p><%= i.comentariu %></p><% } %>
+          </li>
+        <% }) %>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card form-card">
+    <h3>Actualizează cererea</h3>
+    <form action="/admin/service/<%= cerere.id_cerere %>" method="post" class="form">
+      <label>Tehnician
+        <select name="id_angajat">
+          <option value="">— nealocat —</option>
+          <% angajati.forEach(a => { %><option value="<%= a.id_utilizator %>" <%= cerere.id_angajat == a.id_utilizator ? 'selected' : '' %>><%= a.nume %></option><% }) %>
+        </select>
+      </label>
+      <label>Status
+        <select name="status">
+          <% for (const [k, v] of Object.entries(STATUS_SERVICE)) { %><option value="<%= k %>" <%= cerere.status === k ? 'selected' : '' %>><%= v %></option><% } %>
+        </select>
+      </label>
+      <label>Cost estimat (lei)<input type="number" step="0.01" min="0" name="cost_estimat" value="<%= cerere.cost_estimat || '' %>"></label>
+      <label>Cost final (lei)<input type="number" step="0.01" min="0" name="cost_final" value="<%= cerere.cost_final || '' %>"></label>
+      <label>Comentariu pentru istoric<textarea name="comentariu" rows="3" placeholder="ex: Am înlocuit pasta termică..."></textarea></label>
+      <button class="btn-accent">Salvează</button>
+      <p class="muted small">La schimbarea statusului se adaugă automat un rând în istoric, vizibil și clientului.</p>
+    </form>
+  </div>
+</div>
+
+<%- include('_footer') %>

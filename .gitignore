@@ -10,3 +10,7 @@ __pycache__/
 .vscode/
 Thumbs.db
 desktop.ini
+
+# Loguri
+*.log
+npm-debug.log*

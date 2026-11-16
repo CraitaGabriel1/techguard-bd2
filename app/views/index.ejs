@@ -1,0 +1,90 @@
+<%- include('partials/header') %>
+
+<!-- Banner principal -->
+<section class="hero">
+  <div>
+    <span class="tag">Noiembrie 2026</span>
+    <h1>Tehnologia de care ai nevoie,<br><span class="accent">la un click distanță.</span></h1>
+    <p>Componente PC, laptopuri, console, periferice și jocuri. Plus service propriu pentru reparații și mentenanță.</p>
+    <div class="hero-btns">
+      <a href="/produse" class="btn-accent btn-lg">Vezi produsele →</a>
+      <a href="/service" class="btn-ghost btn-lg">Programează un service</a>
+    </div>
+  </div>
+</section>
+
+<!-- Categorii cu "de la X lei" – calculate din baza de date -->
+<section class="section">
+  <div class="section-head">
+    <div>
+      <h2>Categorii</h2>
+      <p>Tot ce îți trebuie pentru setup-ul tău.</p>
+    </div>
+    <a href="/produse" class="btn-ghost">Toate produsele →</a>
+  </div>
+
+  <div class="grid-cat">
+    <% categorii.forEach(cat => { %>
+      <a href="/categorie/<%= cat.slug %>" class="card cat-card">
+        <h3><%= cat.nume %></h3>
+        <p><%= cat.descriere %></p>
+        <div class="cat-foot">
+          <% if (cat.pret_minim) { %>
+            <span class="muted">de la</span>
+            <span class="price"><%= lei(cat.pret_minim) %> <small>lei</small></span>
+          <% } else { %>
+            <span class="muted">în curând</span>
+          <% } %>
+          <span class="badge"><%= cat.nr_produse %> produse</span>
+        </div>
+      </a>
+    <% }) %>
+  </div>
+</section>
+
+<% if (topVanzari.length) { %>
+<section class="section">
+  <div class="section-head">
+    <div>
+      <h2>Cele mai vândute</h2>
+      <p>Produsele alese cel mai des de clienții noștri.</p>
+    </div>
+  </div>
+  <div class="grid-products">
+    <% topVanzari.forEach(p => { %><%- include('partials/produs-card', { p }) %><% }) %>
+  </div>
+</section>
+<% } %>
+
+<!-- Zona de service – ce ne diferențiază -->
+<section class="section service-banner card">
+  <div>
+    <span class="tag">🔧 Service TECHGUARD</span>
+    <h2>PC-ul, laptopul sau consola nu mai merg cum trebuie?</h2>
+    <p class="muted">Diagnosticare, curățare, reinstalare, reparații pentru console și periferice. Urmărești online fiecare etapă a reparației.</p>
+    <a href="/service" class="btn-accent btn-lg">Trimite o cerere de service</a>
+  </div>
+  <div class="service-list">
+    <% servicii.forEach(s => { %>
+      <div class="service-item">
+        <span><%= s.nume %></span>
+        <b>de la <%= lei(s.pret_estimativ) %> lei</b>
+      </div>
+    <% }) %>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <div>
+      <h2>Noutăți</h2>
+      <p>Cele mai recente produse adăugate în magazin.</p>
+    </div>
+    <a href="/produse?sort=noi" class="btn-ghost">Vezi toate →</a>
+  </div>
+  <div class="grid-products">
+    <% noutati.forEach(p => { %><%- include('partials/produs-card', { p }) %><% }) %>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

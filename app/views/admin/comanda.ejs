@@ -1,0 +1,58 @@
+<%- include('_header') %>
+
+<div class="page-head">
+  <h1 class="page-title">Comanda <%= comanda.numar_comanda %> <span class="status s-<%= comanda.status %>"><%= STATUS_COMANDA[comanda.status] %></span></h1>
+  <a href="/admin/comenzi" class="btn-ghost">← Toate comenzile</a>
+</div>
+
+<div class="two-cols wide-left">
+  <div class="card">
+    <table class="table">
+      <thead><tr><th>Cod</th><th>Produs</th><th class="right">Preț la cumpărare</th><th class="right">Cant.</th><th class="right">Subtotal</th></tr></thead>
+      <tbody>
+        <% produse.forEach(p => { %>
+          <tr>
+            <td><code><%= p.cod_produs %></code></td>
+            <td><%= p.nume %></td>
+            <td class="right"><%= lei(p.pret_unitar) %></td>
+            <td class="right"><%= p.cantitate %></td>
+            <td class="right"><b><%= lei(p.subtotal) %></b></td>
+          </tr>
+        <% }) %>
+        <tr><td colspan="4" class="right">Transport</td><td class="right"><%= lei(comanda.cost_transport) %></td></tr>
+        <tr class="total"><td colspan="4" class="right">Total</td><td class="right"><%= lei(comanda.total) %> lei</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div>
+    <div class="card form-card">
+      <h3>Schimbă statusul</h3>
+      <% if (comanda.status === 'anulata') { %>
+        <p class="muted">Comanda este anulată. Produsele au revenit în stoc.</p>
+      <% } else { %>
+        <form action="/admin/comenzi/<%= comanda.id_comanda %>/status" method="post" class="form"
+              onsubmit="return this.status.value !== 'anulata' || confirm('Anulezi comanda? Produsele vor reveni în stoc.')">
+          <select name="status">
+            <% for (const [k, v] of Object.entries(STATUS_COMANDA)) { %>
+              <option value="<%= k %>" <%= comanda.status === k ? 'selected' : '' %>><%= v %></option>
+            <% } %>
+          </select>
+          <button class="btn-accent">Actualizează</button>
+        </form>
+      <% } %>
+    </div>
+
+    <div class="card form-card">
+      <h3>Client și livrare</h3>
+      <p><b><%= comanda.client %></b><br><span class="muted"><%= comanda.email %></span></p>
+      <p><%= comanda.adresa_livrare %><br><%= comanda.oras_livrare %>, jud. <%= comanda.judet_livrare %></p>
+      <p><span class="muted">Telefon:</span> <%= comanda.telefon_contact %></p>
+      <p><span class="muted">Plată:</span> <%= PLATA[comanda.metoda_plata] %></p>
+      <p><span class="muted">Data:</span> <%= dataOra(comanda.data_comanda) %></p>
+      <% if (comanda.observatii) { %><p><span class="muted">Observații:</span> <%= comanda.observatii %></p><% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('_footer') %>

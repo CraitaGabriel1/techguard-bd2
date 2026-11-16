@@ -1,50 +1,93 @@
+<p align="center">
+  <img src="app/public/img/logo.png" alt="TECHGUARD" height="90">
+</p>
+
 # TECHGUARD – Magazin online IT & Gaming
 
 Proiect pentru disciplina **Baze de Date Avansate** (2026–2027)
-Student: Crăița Gabriel Ștefan · Grupa 22C31A
+Student: **Crăița Gabriel Ștefan** · Grupa **22C31A** · Universitatea „Dunărea de Jos” din Galați
 
 Magazin online pentru produse IT & Gaming (componente, calculatoare, laptopuri, console,
-periferice, jocuri) cu zonă de service pentru mentenanță și reparații.
+periferice, jocuri), cu zonă proprie de **service** pentru mentenanță și reparații.
 
-## Etape
-| Etapă | Conținut | Stare |
-|---|---|---|
-| 0 – Tema | Domeniu, funcționalități, roluri | ✅ Finalizată |
-| 1 – Modelare | 13 tabele, relații, PK/FK, date de test | ✅ Finalizată |
-| 2 – CRUD | Administrare produse, categorii, utilizatori, comenzi, service | ⏳ |
-| 3 – Autentificare | Înregistrare, login, 3 roluri | ⏳ |
-| 4 – Performanță | Indecși, optimizare, load test | ⏳ |
-| 5 – Rapoarte | Export PDF / CSV / Excel | ⏳ |
-| 6 – Susținere | Prezentare finală | ⏳ |
+![Prima pagină](docs/screenshots/01_acasa.jpg)
+
+## Etapele proiectului
+| Etapă | Conținut | Stare | Documentație |
+|---|---|---|---|
+| 0 – Tema | Domeniu, funcționalități, roluri | ✅ Finalizată | [`docs/Etapa0`](docs/Etapa0) |
+| 1 – Modelare | 13 tabele, relații, PK/FK, date de test | ✅ Finalizată | [`docs/Etapa1`](docs/Etapa1) |
+| 2 – CRUD | Magazin, coș, comenzi, panou de administrare | ✅ Finalizată | [`docs/Etapa2`](docs/Etapa2/Etapa2_CRUD.md) |
+| 3 – Autentificare | Înregistrare, login, 3 roluri | 🟡 Implementată, documentația urmează | – |
+| 4 – Performanță | Indecși, optimizare, load test | ⏳ | – |
+| 5 – Rapoarte | Export PDF / CSV / Excel | ⏳ | – |
+| 6 – Susținere | Prezentare finală | ⏳ | – |
+
+## Funcționalități
+**Magazin (oricine):** prima pagină cu categorii și „de la X lei”, cele mai vândute produse, catalog cu filtre
+(stoc, preț, marcă), sortare și paginare, căutare, pagina produsului cu specificații tehnice (JSONB), pagina de service.
+
+**Client:** cont nou și autentificare, coș de cumpărături, plasarea comenzii (tranzacție), istoricul comenzilor,
+anularea unei comenzi „plasate”, cereri de service cu istoricul reparației, editarea datelor și a parolei.
+
+**Angajat:** panou de administrare – produse, stocuri (mișcări de stoc), mărci, comenzi (schimbare status),
+cereri de service (tehnician, status, costuri).
+
+**Administrator:** tot ce face angajatul + categorii, servicii și utilizatori (roluri, blocare cont).
+
+## Capturi de ecran
+| Catalog | Pagina produsului |
+|---|---|
+| ![Catalog](docs/screenshots/02_catalog.jpg) | ![Produs](docs/screenshots/03_produs.jpg) |
+| **Coș** | **Comandă client** |
+| ![Coș](docs/screenshots/05_cos.jpg) | ![Comandă](docs/screenshots/06_comanda_client.jpg) |
+| **Panou de administrare** | **Administrare produse** |
+| ![Admin](docs/screenshots/07_admin_panou.jpg) | ![Produse](docs/screenshots/08_admin_produse.jpg) |
+| **Cerere de service (admin)** | **Utilizatori** |
+| ![Service](docs/screenshots/09_admin_service.jpg) | ![Utilizatori](docs/screenshots/10_admin_utilizatori.jpg) |
 
 ## Structura proiectului
 ```
 PROIECT BD/
-├── README.md                       ← această pagină
-├── docs/                           ← documentația fiecărei etape
-│   ├── Etapa0/
-│   │   └── TECHGUARD_Etapa0_Tema.pdf
-│   └── Etapa1/
-│       ├── TECHGUARD_Etapa1_Modelare.pdf   ← documentul de predat
-│       ├── 01_Structura_tabele.md
-│       ├── 02_Relatii_ERD.md               ← diagrama ERD (Mermaid)
-│       ├── 03_Normalizare.md
-│       └── ERD.png
-├── database/                       ← baza de date PostgreSQL
-│   ├── 01_schema.sql               ← creează cele 13 tabele
-│   ├── 02_date_test.sql            ← datele de test (fixtures)
-│   ├── 03_verificare.sql           ← interogări de verificare
-│   └── rezultat_verificare.txt     ← rezultatul ultimei rulări
-└── scripts/                        ← scripturi de lucru (dublu-click)
-    ├── ruleaza_etapa1.bat          ← creează și populează baza de date
-    └── publica_github.bat          ← urcă modificările pe GitHub
+├── README.md                         ← această pagină
+├── app/                              ← aplicația web (Node.js + Express + EJS)
+│   ├── server.js                     ← pornește serverul, sesiunile, meniul comun
+│   ├── db.js                         ← conexiunea la PostgreSQL (Pool)
+│   ├── .env.example                  ← model pentru setările bazei de date
+│   ├── routes/
+│   │   ├── public.js                 ← acasă, catalog, căutare, produs, service
+│   │   ├── auth.js                   ← login, înregistrare, logout
+│   │   ├── client.js                 ← coș, comandă, contul meu
+│   │   └── admin.js                  ← panoul de administrare (CRUD)
+│   ├── lib/operatii.js               ← operații în tranzacții (comandă, stoc, service)
+│   ├── middleware/auth.js            ← verificarea rolurilor
+│   ├── views/                        ← paginile (EJS): magazin, cont, admin, partials
+│   └── public/                       ← CSS, logo, imaginile produselor
+├── database/                         ← baza de date PostgreSQL
+│   ├── 01_schema.sql                 ← creează cele 13 tabele
+│   ├── 02_date_test.sql              ← datele de test (fixtures)
+│   ├── 03_verificare.sql             ← interogări de verificare
+│   └── rezultat_verificare.txt       ← rezultatul ultimei rulări
+├── docs/                             ← documentația fiecărei etape
+│   ├── Etapa0/  TECHGUARD_Etapa0_Tema.pdf
+│   ├── Etapa1/  TECHGUARD_Etapa1_Modelare.pdf, ERD, normalizare
+│   ├── Etapa2/  Etapa2_CRUD.md (arhitectură, CRUD, descrierea paginilor)
+│   └── screenshots/                  ← capturi de ecran ale aplicației
+└── scripts/                          ← scripturi de lucru (dublu-click)
+    ├── ruleaza_etapa1.bat            ← creează și populează baza de date
+    ├── porneste_site.bat             ← pornește site-ul (http://localhost:3000)
+    └── publica_github.bat            ← urcă modificările pe GitHub
 ```
-De la Etapa 2, codul aplicației (site-ul) va fi adăugat în folderul `app/`.
 
-## Cum creez baza de date
-Dublu-click pe `scripts\ruleaza_etapa1.bat` și introdu parola utilizatorului `postgres`.
+## Instalare și pornire
+1. **Baza de date** – dublu-click pe `scripts\ruleaza_etapa1.bat` și introdu parola utilizatorului `postgres`.
+2. **Node.js** – instalează versiunea LTS de pe https://nodejs.org
+3. **Setări** – copiază `app\.env.example` ca `app\.env` și completează `DB_PASSWORD=` cu parola de PostgreSQL.
+4. **Pornire** – dublu-click pe `scripts\porneste_site.bat` → se deschide http://localhost:3000
 
-Sau manual, din PowerShell:
+<details>
+<summary>Crearea bazei de date manual, din PowerShell</summary>
+
 ```powershell
 cd "A:\PROIECT BD"
 $psql = "A:\APLICATII\POSTGRESS\bin\psql.exe"
@@ -53,6 +96,7 @@ $psql = "A:\APLICATII\POSTGRESS\bin\psql.exe"
 & $psql -U postgres -d techguard -f database\02_date_test.sql
 & $psql -U postgres -d techguard -f database\03_verificare.sql
 ```
+</details>
 
 ## Conturi de test
 Parola pentru toate conturile: `Parola123!`
@@ -63,4 +107,7 @@ Parola pentru toate conturile: `Parola123!`
 | Client | `mihai.ionescu@gmail.com` |
 
 ## Tehnologii
-- Bază de date: **PostgreSQL 18**
+- **Bază de date:** PostgreSQL 18 – 13 tabele, chei străine, constrângeri `CHECK`/`UNIQUE`, JSONB, tranzacții
+- **Server:** Node.js + Express, pachetul `pg` (SQL scris manual, parametrizat)
+- **Pagini:** EJS + CSS propriu (temă întunecată pentru magazin, temă deschisă pentru administrare)
+- **Autentificare:** `express-session` + parole criptate cu `bcryptjs`
